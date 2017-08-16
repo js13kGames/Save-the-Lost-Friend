@@ -40,19 +40,20 @@ CanvasDisplay.prototype.drawFrame = function(step) {
 
 CanvasDisplay.prototype.updateViewport = function() {
     var view = this.viewport,
-        margin = view.width / 3;
+        marginX = view.width / 3,
+        marginY = view.height / 3;
     var player = this.level.player;
     var center = player.pos.plus(player.size.times(0.5));
 
-    if (center.x < view.left + margin)
-        view.left = Math.max(center.x - margin, 0);
-    else if (center.x > view.left + view.width - margin)
-        view.left = Math.min(center.x + margin - view.width,
+    if (center.x < view.left + marginX)
+        view.left = Math.max(center.x - marginX, 0);
+    else if (center.x > view.left + view.width - marginX)
+        view.left = Math.min(center.x + marginX - view.width,
             this.level.width - view.width);
-    if (center.y < view.top + margin)
-        view.top = Math.max(center.y - margin, 0);
-    else if (center.y > view.top + view.height - margin)
-        view.top = Math.min(center.y + margin - view.height,
+    if (center.y < view.top + marginY)
+        view.top = Math.max(center.y - marginY, 0);
+    else if (center.y > view.top + view.height - marginY)
+        view.top = Math.min(center.y + marginY - view.height,
             this.level.height - view.height);
 };
 

@@ -24,10 +24,15 @@ var Level = function(levelInfo) {
         }
         this.grid.push(gridLine); // Push the field type.
     }
-
-    this.player = this.actors.filter(function(actor) { // Get the player instance separately.
-        return actor.type == "player";
-    })[0];
+    if (levelInfo.type == LEVEL_TYPE.PLATFORMER) {
+        this.player = this.actors.filter(function(actor) { // Get the player instance separately.
+            return actor.type == "player";
+        })[0];
+    } else if (levelInfo.type == LEVEL_TYPE.NONPLATFORMER) {
+        this.player = this.actors.filter(function(actor) { // Get the player instance separately.
+            return actor.type == "player_non_platformer";
+        })[0];
+    }
     this.status = this.finishDelay = null;
 };
 
@@ -124,10 +129,7 @@ Vector.prototype.times = function(scaleNos) {
     return new Vector(scaleNos * this.x, scaleNos * this.y);
 };
 
-
-
-
-var arrowCodes = { 37: "left", 38: "up", 39: "right", 70: "fly", 71: "revokeFly" };
+var arrowCodes = { 37: "left", 38: "up", 39: "right", 40: "down", 70: "fly", 71: "revokeFly" };
 
 // Create the key handler func & register for the keydown and keyup.
 var trackKeys = function(codes) {

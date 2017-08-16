@@ -83,14 +83,18 @@ Player.prototype.moveY = function(step, level, keys) {
     }
 };
 
+Player.prototype.move = function(step, level, keys) {
+    this.moveX(step, level, keys);
+    this.moveY(step, level, keys);
+}
+
 // Called for every draw loop from animate.
 // Call the moveX & moveY  ( checks collision with static layer.)
 // Check for collisions with dynamic layer.
 // If yes call playerTouched
 // status is lost losing animation.
 Player.prototype.act = function(step, level, keys) {
-    this.moveX(step, level, keys);
-    this.moveY(step, level, keys);
+    this.move(step, level, keys);
     // Check for collisions with dynamic layer.
     var collidedObject = level.actorAt(this);
     if (collidedObject)
@@ -123,6 +127,50 @@ Player.prototype.draw = function(cx, x, y) {
     }
     cx.restore();
 }
+
+function PlayerNonPlatform(pos) {
+    this.pos = pos.plus(new Vector(0, -0.5));
+    this.size = new Vector(0.8, 1.5);
+    this.speed = new Vector(0, 0);
+    this.facingRight = true;
+    this.facingUp = true;
+}
+PlayerNonPlatform.prototype.type = "player_non_platformer";
+
+PlayerNonPlatform.prototype.draw = Player.prototype.draw;
+
+PlayerNonPlatform.prototype.move = function(step, level, keys) {
+    this.speed.x = 0;
+    this.speed.y = 0;
+    var PLAYER_NON_PLATFORM_SPEED = 4;
+    if (keys.left) {
+        this.speed.x -= PLAYER_NON_PLATFORM_SPEED;
+        this.facingRight = false;
+    }
+    if (keys.right) {
+        this.speed.x += PLAYER_NON_PLATFORM_SPEED;
+        this.facingRight = true;
+    }
+    if (keys.up) {
+        this.speed.y -= PLAYER_NON_PLATFORM_SPEED;
+        this.facingUp = true;
+    }
+    if (keys.down) {
+        this.speed.y += PLAYER_NON_PLATFORM_SPEED;
+        this.facingUp = false;
+    }
+
+    var motion = new Vector(this.speed.x * step, this.speed.y * step);
+    var newPos = this.pos.plus(motion);
+    var obstacle = level.obstacleAt(newPos, this.size)
+    if (obstacle) {
+        level.playerTouched(obstacle);
+    } else {
+        this.pos = newPos;
+    }
+};
+
+PlayerNonPlatform.prototype.act = Player.prototype.act;
 
 // var Lava = function(posVector, char) {
 function Lava(pos, char) {

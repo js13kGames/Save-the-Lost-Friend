@@ -1,51 +1,47 @@
-var waterLevelMap = ["                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                  xxx           ",
-    "                                                   xx      xx    xx!xx          ",
-    "                                    o o      xx                  x!!!x          ",
-    "                                                                 xx!xx          ",
-    "                                   xxxxx                          xvx           ",
-    "                                                                            xx  ",
-    "  xx                                      o o                                x  ",
-    "  x                     o                                                    x  ",
-    "  x           o                          xxxxx                             o x  ",
-    "  x          xxxx       o                                                    x  ",
-    "  x  @       x  x                                                xxxxx       x  ",
-    "  xxxxxxxxxxxx  xxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxx     xxxxxxx   xxxxxxxxx  ",
-    "                              x   x                  x     x                    ",
-    "                              x!!!x                  x!!!!!x                    ",
-    "                              x!!!x                  x!!!!!x                    ",
-    "                              xxxxx                  xxxxxxx                    ",
-    "                                                                                ",
-    "                                                                                "
+var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "x                                                l                               x",
+    "x                                                                                x",
+    "x         l          l                                         l                 x",
+    "x                                  l                                             x",
+    "x                                                                                x",
+    "x   l                                                l                           x",
+    "x                                                                                x",
+    "x                     l                                        l                 x",
+    "x          l                                                                     x",
+    "x     l        @      l                                                          x",
+    "x                  l               l                                             x",
+    "x                                                  l              l              x",
+    "x      l                                                                         x",
+    "x                               l                             l                  x",
+    "x                                                                                x",
+    "x                                          l                                     x",
+    "x              l                                               l                 x",
+    "x                                                                                x",
+    "x  l      l                     l                                                x",
+    "x                                                                                x",
+    "x                                           l                                    x",
+    "x                                                                     l          x",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ];
 
 var waterLevelBackgroundChars = {
     "x": "wall",
-    "!": "water"
+    "l": "log"
 };
 var waterLevelActorChars = {
-    "@": Player,
-    "o": Coin,
-    "=": Lava,
-    "|": Lava,
-    "v": Lava
+    "@": PlayerNonPlatform
 };
-var waterLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, waterLevelMap, waterLevelBackgroundChars, waterLevelActorChars);
+var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelMap, waterLevelBackgroundChars, waterLevelActorChars);
 waterLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
         cx.save();
-        cx.fillStyle = "white";
+        cx.fillStyle = "yellow";
         cx.fillRect(x, y, 20.5, 20);
         cx.restore();
-    } else if (backgroundChar == "water") {
+    } else if (backgroundChar == "log") {
         cx.save();
-        cx.fillStyle = "blue";
-        cx.fillRect(x, y, 20.5, 20);
+        cx.fillStyle = "brown";
+        cx.fillRect(x, y, 20.5, 10);
         cx.restore();
     }
 };
