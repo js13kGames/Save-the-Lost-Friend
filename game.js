@@ -98,7 +98,7 @@ Level.prototype.animate = function(step, keys) {
 };
 
 Level.prototype.playerTouched = function(type, actor) {
-    if ((type == "lava" || type == "water") && (this.status == null)) {
+    if ((type == "lava" || type == "shark") && (this.status == null)) {
         this.status = "lost";
         this.finishDelay = 1;
     } else if (type == "coin") { //Filter the coin from actor list as it is picked
