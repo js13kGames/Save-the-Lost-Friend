@@ -1,5 +1,5 @@
-var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "x                                                l                               x",
+var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeeeeeeeexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "x                             eeeeeeeeee         l                               x",
     "x                                                                                x",
     "x         l          l                                  s      l                 x",
     "x                         s        l                                             x",
@@ -8,21 +8,67 @@ var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     "x                                                                                x",
     "x                     l                                        l                 x",
     "x          l                                     s                               x",
-    "x     l              l                  @                                        x",
-    "x                  l               l                                             x",
-    "x                                                  l              l              x",
-    "x      l               s                                                         x",
-    "x                               l                             l                  x",
-    "x                                                                                x",
+    "aa    l              l                  @                                       ff",
+    "aa                 l               l                                            ff",
+    "aa                                                 l              l             ff",
+    "aa     l               s                                                        ff",
+    "aa                              l                             l                 ff",
+    "aa                                                                              ff",
     "x                                          l             s                       x",
     "x              l                                               l                 x",
     "x                               s                                                x",
     "x  l      l                     l                                                x",
     "x                                                                                x",
     "x                                           l                                    x",
-    "x                                                                     l          x",
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    "x                              wwwwwwwwww                             l          x",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxwwwwwwwwwwxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ];
+
+function Island(pos, char) {
+    this.pos = pos;
+    this.size = new Vector(1, 1);
+    this.color = null;
+    this.type = null;
+}
+
+Island.prototype.draw = function(cx, x, y) {
+    cx.save();
+    cx.fillStyle = this.color;
+    cx.fillRect(x, y, Game.scale, Game.scale);
+    cx.restore();
+}
+
+Island.prototype.act = function(step, level) {
+
+}
+
+function Earth(pos, char) {
+    Island.call(this, pos, char);
+    this.type = "earth";
+    this.color = "brown";
+}
+Earth.prototype = Object.create(Island.prototype);
+
+function Water(pos, char) {
+    Island.call(this, pos, char);
+    this.type = "water";
+    this.color = "green";
+}
+Water.prototype = Object.create(Island.prototype);
+
+function Fire(pos, char) {
+    Island.call(this, pos, char);
+    this.type = "fire";
+    this.color = "red";
+}
+Fire.prototype = Object.create(Island.prototype);
+
+function Air(pos, char) {
+    Island.call(this, pos, char);
+    this.type = "air";
+    this.color = "white";
+}
+Air.prototype = Object.create(Island.prototype);
 
 function Shark(pos, char) {
     this.pos = pos;
@@ -91,15 +137,44 @@ Shark.prototype.draw = function(cx, x, y) {
     cx.restore();
 }
 
+
+function WaterPlayer(pos) {
+    PlayerNonPlatform.call(this, pos);
+    this.health = 50;
+}
+WaterPlayer.prototype = Object.create(PlayerNonPlatform.prototype);
+
 var waterLevelBackgroundChars = {
     "x": "wall",
     "l": "log"
 };
 var waterLevelActorChars = {
-    "@": PlayerNonPlatform,
-    "s": Shark
+    "@": WaterPlayer,
+    "s": Shark,
+    "w": Water,
+    "e": Earth,
+    "f": Fire,
+    "a": Air
 };
+
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelMap, waterLevelBackgroundChars, waterLevelActorChars);
+
+waterLevel.playerTouched = function(type, actor, level) {
+    if ((type == "shark") && (level.status == null)) {
+        if (level.player.playerHitTimer == 0) {
+            level.player.health -= 10;
+            level.player.playerHitTimer = level.player.playerHitTimerMax;
+        }
+        console.log("Player health:" + level.player.health + " " + level.player.playerHitTimer);
+        if (level.player.health <= 0) {
+            return "lost"
+        }
+    }
+    if (type == "earth" && level.status == null) {
+        return "won";
+    }
+};
+
 waterLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
         cx.save();

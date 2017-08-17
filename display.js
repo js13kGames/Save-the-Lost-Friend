@@ -6,8 +6,9 @@ function flipHorizontally(context, around) {
 
 function CanvasDisplay(parent, level) {
     this.canvas = document.createElement("canvas");
-    this.canvas.width = Math.min(1000, level.width * Game.scale);
-    this.canvas.height = Math.min(450, level.height * Game.scale);
+    this.canvas.width = Math.min(Game.width, level.width * Game.scale);
+    this.canvas.height = Math.min(Game.height, level.height * Game.scale);
+    this.canvas.style = "z-index: 1;position:absolute;left:0px;top:0px;";
     parent.appendChild(this.canvas);
     this.cx = this.canvas.getContext("2d");
 
@@ -92,6 +93,10 @@ CanvasDisplay.prototype.drawActors = function() {
         var height = actor.size.y * Game.scale;
         var x = (actor.pos.x - this.viewport.left) * Game.scale;
         var y = (actor.pos.y - this.viewport.top) * Game.scale;
-        actor.draw(this.cx, x, y);
+        if (actor.type != "player")
+            actor.draw(this.cx, x, y);
     }, this);
+    var x = (this.level.player.pos.x - this.viewport.left) * Game.scale;
+    var y = (this.level.player.pos.y - this.viewport.top) * Game.scale;
+    this.level.player.draw(this.cx, x, y);
 };

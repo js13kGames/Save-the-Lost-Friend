@@ -9,6 +9,9 @@ function Player(pos) {
     this.fly = false;
     this.flyPower = FLY_POWER_MAX;
     this.facingRight = true;
+    this.health = 100;
+    this.playerHitTimer = 0;
+    this.playerHitTimerMax = 100;
 }
 Player.prototype.type = "player";
 
@@ -109,6 +112,9 @@ Player.prototype.act = function(step, level, keys) {
     if (keys.revokeFly) {
         this.fly = false;
     }
+    if (level.player.playerHitTimer > 0) {
+        level.player.playerHitTimer--;
+    }
 };
 
 Player.prototype.draw = function(cx, x, y) {
@@ -134,6 +140,9 @@ function PlayerNonPlatform(pos) {
     this.speed = new Vector(0, 0);
     this.facingRight = true;
     this.facingUp = true;
+    this.health = 100;
+    this.playerHitTimer = 0;
+    this.playerHitTimerMax = 100;
 }
 PlayerNonPlatform.prototype.type = "player_non_platformer";
 

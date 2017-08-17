@@ -64,3 +64,20 @@ fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
         cx.restore();
     }
 };
+
+fireLevel.playerTouched = function(type, actor, level) {
+    if (type == "lava") {
+        return "lost";
+    } else if (type == "coin") { //Filter the coin from actor list as it is picked
+        level.actors = level.actors.filter(function(inDivActor) {
+            return inDivActor != actor;
+        });
+        // Check if any coins left.  If no coins left then win condition met
+        if (!level.actors.some(function(actor) {
+                return actor.type == "coin";
+            })) {
+            return "won";
+        }
+    }
+
+}

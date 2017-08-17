@@ -1,7 +1,9 @@
 var Game = {
     scale: 20,
     gamePaused: false,
-    tileSize: 20
+    tileSize: 20,
+    width: 1000,
+    height: 450
 };
 
 var Level = function(levelInfo) {
@@ -39,6 +41,7 @@ var Level = function(levelInfo) {
             return actor.type == "player_non_platformer";
         })[0];
     }
+    console.log(this.player.health);
     this.status = this.finishDelay = null;
 };
 
@@ -104,22 +107,11 @@ Level.prototype.animate = function(step, keys) {
 };
 
 Level.prototype.playerTouched = function(type, actor) {
-    if ((type == "lava" || type == "shark") && (this.status == null)) {
-        this.status = "lost";
+    var levelStatus = this.levelInfo.playerTouched(type, actor, this);
+    if (levelStatus == "lost" || levelStatus == "won") {
+        this.status = levelStatus;
         this.finishDelay = 1;
-    } else if (type == "coin") { //Filter the coin from actor list as it is picked
-        this.actors = this.actors.filter(function(inDivActor) {
-            return inDivActor != actor;
-        });
-        // Check if any coins left.  If no coins left then win condition met
-        if (!this.actors.some(function(actor) {
-                return actor.type == "coin";
-            })) {
-            this.status = "won";
-            this.finishDelay = 1;
-        }
     }
-
 };
 
 var Vector = function(x, y) {
@@ -194,10 +186,12 @@ var keys = trackKeys(keyCodes);
 // Called from runGame.
 // Calls runAnimation function with an anonymous func as parameter
 function runLevel(level, Display, andThen) {
-    var display = new Display(document.body, level); // Clear display for each level.
+    var display = new Display(document.body, level); // Clear display for each level.   
+    var hud = new InGameHUD(document.body);
     runAnimation(function(step) {
         level.animate(step, keys);
         display.drawFrame(step);
+        hud.draw();
         if (level.isFinished()) {
             display.clear();
             if (andThen) {
