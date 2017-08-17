@@ -1,3 +1,9 @@
+var Game = {
+    scale: 20,
+    gamePaused: false,
+    tileSize: 20
+};
+
 var Level = function(levelInfo) {
     var plan = levelInfo.level;
     this.levelInfo = levelInfo;
@@ -129,7 +135,7 @@ Vector.prototype.times = function(scaleNos) {
     return new Vector(scaleNos * this.x, scaleNos * this.y);
 };
 
-var arrowCodes = { 37: "left", 38: "up", 39: "right", 40: "down", 70: "fly", 71: "revokeFly" };
+var keyCodes = { 37: "left", 38: "up", 39: "right", 40: "down", 70: "fly", 71: "revokeFly", 80: "pause" };
 
 // Create the key handler func & register for the keydown and keyup.
 var trackKeys = function(codes) {
@@ -149,15 +155,30 @@ var trackKeys = function(codes) {
     return pressed;
 }
 
+var pauseIsDown = false;
+
+// Toggle the gamePaused variable whenever p key is pressed and released.
+function pauseKeyHandler() {
+    if (keys.pause) {
+        pauseIsDown = true;
+    }
+    if (pauseIsDown && !keys.pause) {
+        Game.gamePaused = !Game.gamePaused;
+        pauseIsDown = false;
+    }
+}
 
 var runAnimation = function(frameFunc) { // frameFunc  anonymous func.
     var lastTime = null;
 
     function frame(time) {
+        pauseKeyHandler();
         var stop = false;
         if (lastTime != null) {
             var timeStep = Math.min(time - lastTime, 100) / 1000;
-            stop = frameFunc(timeStep) == false;
+            if (!Game.gamePaused) {
+                stop = frameFunc(timeStep) == false;
+            }
         }
         lastTime = time;
         if (!stop) {
@@ -168,14 +189,14 @@ var runAnimation = function(frameFunc) { // frameFunc  anonymous func.
     requestAnimationFrame(frame);
 };
 
-var arrows = trackKeys(arrowCodes);
+var keys = trackKeys(keyCodes);
 
 // Called from runGame.
 // Calls runAnimation function with an anonymous func as parameter
 function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level); // Clear display for each level.
     runAnimation(function(step) {
-        level.animate(step, arrows);
+        level.animate(step, keys);
         display.drawFrame(step);
         if (level.isFinished()) {
             display.clear();

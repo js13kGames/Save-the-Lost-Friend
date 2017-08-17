@@ -199,7 +199,6 @@ Lava.prototype.act = function(step, level) {
     } else {
         this.speed = this.speed.times(-1);
     }
-
 };
 
 Lava.prototype.draw = function(cx, x, y) {
@@ -212,9 +211,6 @@ Lava.prototype.draw = function(cx, x, y) {
 
 var wobbleSpeed = 8,
     wobbleDist = 0.07;
-
-var scale = 20;
-var tileSize = 20;
 
 function Coin(pos) {
     this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
@@ -234,7 +230,7 @@ Coin.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = "yellow";
     cx.beginPath();
-    cx.arc(x, y, scale / 5, 0, 2 * Math.PI);
+    cx.arc(x, y, Game.scale / 5, 0, 2 * Math.PI);
     cx.fill();
     cx.restore();
 }

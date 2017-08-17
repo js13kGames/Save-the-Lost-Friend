@@ -6,8 +6,8 @@ function flipHorizontally(context, around) {
 
 function CanvasDisplay(parent, level) {
     this.canvas = document.createElement("canvas");
-    this.canvas.width = Math.min(1000, level.width * scale);
-    this.canvas.height = Math.min(450, level.height * scale);
+    this.canvas.width = Math.min(1000, level.width * Game.scale);
+    this.canvas.height = Math.min(450, level.height * Game.scale);
     parent.appendChild(this.canvas);
     this.cx = this.canvas.getContext("2d");
 
@@ -18,8 +18,8 @@ function CanvasDisplay(parent, level) {
     this.viewport = {
         left: 0,
         top: 0,
-        width: this.canvas.width / scale,
-        height: this.canvas.height / scale
+        width: this.canvas.width / Game.scale,
+        height: this.canvas.height / Game.scale
     };
 
     this.drawFrame(0);
@@ -79,8 +79,8 @@ CanvasDisplay.prototype.drawBackground = function() {
         for (var x = xStart; x < xEnd; x++) {
             var tile = this.level.grid[y][x];
             if (tile == null) continue;
-            var screenX = (x - view.left) * scale;
-            var screenY = (y - view.top) * scale;
+            var screenX = (x - view.left) * Game.scale;
+            var screenY = (y - view.top) * Game.scale;
             this.level.levelInfo.drawBackground(tile, this.cx, screenX, screenY);
         }
     }
@@ -88,10 +88,10 @@ CanvasDisplay.prototype.drawBackground = function() {
 
 CanvasDisplay.prototype.drawActors = function() {
     this.level.actors.forEach(function(actor) {
-        var width = actor.size.x * scale;
-        var height = actor.size.y * scale;
-        var x = (actor.pos.x - this.viewport.left) * scale;
-        var y = (actor.pos.y - this.viewport.top) * scale;
+        var width = actor.size.x * Game.scale;
+        var height = actor.size.y * Game.scale;
+        var x = (actor.pos.x - this.viewport.left) * Game.scale;
+        var y = (actor.pos.y - this.viewport.top) * Game.scale;
         actor.draw(this.cx, x, y);
     }, this);
 };

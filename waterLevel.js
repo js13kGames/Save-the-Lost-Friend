@@ -8,7 +8,7 @@ var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     "x                                                                                x",
     "x                     l                                        l                 x",
     "x          l                                     s                               x",
-    "x     l        @      l                                                          x",
+    "x     l              l                  @                                        x",
     "x                  l               l                                             x",
     "x                                                  l              l              x",
     "x      l               s                                                         x",
@@ -53,10 +53,40 @@ Shark.prototype.act = function(step, level) {
 Shark.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = "grey";
-    if (this.speedX > 0) {
+    if (this.speed.x != 0) {
         cx.fillRect(x, y, 20, 10);
+        cx.beginPath();
+        if (this.speed.x > 0) {
+            cx.strokeStyle = "white";
+            cx.moveTo(x, y);
+            cx.lineTo(x - 50, y - 20);
+            cx.moveTo(x, y + 10);
+            cx.lineTo(x - 50, y + 30);
+        } else {
+            cx.strokeStyle = "white";
+            cx.moveTo(x + 20, y);
+            cx.lineTo(x + 50, y - 20);
+            cx.moveTo(x + 20, y + 10);
+            cx.lineTo(x + 50, y + 30);
+        }
+        cx.stroke();
     } else {
         cx.fillRect(x, y, 10, 20);
+        cx.beginPath();
+        if (this.speed.y > 0) {
+            cx.strokeStyle = "white";
+            cx.moveTo(x, y);
+            cx.lineTo(x - 20, y - 50);
+            cx.moveTo(x + 10, y);
+            cx.lineTo(x + 30, y - 50);
+        } else {
+            cx.strokeStyle = "white";
+            cx.moveTo(x, y + 20);
+            cx.lineTo(x - 20, y + 50);
+            cx.moveTo(x + 10, y + 20);
+            cx.lineTo(x + 30, y + 50);
+        }
+        cx.stroke();
     }
     cx.restore();
 }
