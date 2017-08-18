@@ -5,7 +5,12 @@ function flipHorizontally(context, around) {
 }
 
 function CanvasDisplay(parent, level) {
+    var existingGameScreen = document.getElementById("gameScreen");
+    if (existingGameScreen) {
+        existingGameScreen.parentNode.removeChild(existingGameScreen);
+    }
     this.canvas = document.createElement("canvas");
+    this.canvas.id = "gameScreen";
     this.canvas.width = Math.min(Game.width, level.width * Game.scale);
     this.canvas.height = Math.min(Game.height, level.height * Game.scale);
     this.canvas.style = "z-index: 1;position:absolute;left:0px;top:0px;";

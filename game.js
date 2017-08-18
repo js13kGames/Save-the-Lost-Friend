@@ -13,6 +13,7 @@ var Level = function(levelInfo) {
     this.height = plan.length;
     this.grid = [];
     this.actors = [];
+    this.dialogActors = [];
     var ch;
     for (y = 0; y < this.height; y++) {
         var line = plan[y];
@@ -20,7 +21,7 @@ var Level = function(levelInfo) {
         for (x = 0; x < this.width; x++) {
             var ch = line[x]; // Get the char.
             var fieldType = null;
-            var Actor = levelInfo.actorChars[ch]; // Is it an dynamic item. Get the constructor for same.
+            var Actor = levelInfo.actorChars[ch]; // Is it an dynamic item. Get the constructor for same.            
             if (Actor)
                 this.actors.push(new Actor(new Vector(x, y), ch)); // Instantate the actor. Needs the vector,ch
             else {
@@ -32,16 +33,9 @@ var Level = function(levelInfo) {
         }
         this.grid.push(gridLine); // Push the field type.
     }
-    if (levelInfo.type == LEVEL_TYPE.PLATFORMER) {
-        this.player = this.actors.filter(function(actor) { // Get the player instance separately.
-            return actor.type == "player";
-        })[0];
-    } else if (levelInfo.type == LEVEL_TYPE.NONPLATFORMER) {
-        this.player = this.actors.filter(function(actor) { // Get the player instance separately.
-            return actor.type == "player_non_platformer";
-        })[0];
-    }
-    console.log(this.player.health);
+    this.player = this.actors.filter(function(actor) { // Get the player instance separately.
+        return actor.type == "player";
+    })[0];
     this.status = this.finishDelay = null;
 };
 
@@ -50,32 +44,35 @@ Level.prototype.isFinished = function() {
     return ((this.status != null) && (this.finishDelay < 0));
 };
 
+
 // Check if there is any object in the static layer at the given bounding box of pos and size.
 Level.prototype.obstacleAt = function(pos, size) {
-        var xStart = Math.floor(pos.x);
-        var xEnd = Math.ceil(pos.x + size.x);
-        var yStart = Math.floor(pos.y);
-        var yEnd = Math.ceil(pos.y + size.y);
+    var xStart = Math.floor(pos.x);
+    var xEnd = Math.ceil(pos.x + size.x);
+    var yStart = Math.floor(pos.y);
+    var yEnd = Math.ceil(pos.y + size.y);
 
-        // Check if beyond boundaries
-        if (xStart < 0 || xEnd > this.width || yStart < 0) {
-            return "wall";
-        } else if (yEnd > this.height) {
-            return "lava";
-        }
+    // Check if beyond boundaries
+    if (xStart < 0 || xEnd > this.width || yStart < 0) {
+        return "wall";
+    } else if (yEnd > this.height) {
+        return "lava";
+    }
 
-        //  Is there any obstacle overlapping the players bounding box.
-        for (var y = yStart; y < yEnd; y++) {
-            for (var x = xStart; x < xEnd; x++) {
-                var fieldType = this.grid[y][x];
-                if (fieldType) {
-                    return fieldType
-                }
+    //  Is there any obstacle overlapping the players bounding box.
+    for (var y = yStart; y < yEnd; y++) {
+        for (var x = xStart; x < xEnd; x++) {
+            var fieldType = this.grid[y][x];
+            if (fieldType) {
+                return fieldType
             }
         }
-
     }
-    // Collision with any other dynamic object.
+
+}
+
+
+// Collision with any other dynamic object.
 Level.prototype.actorAt = function(actor) {
     var other;
     for (var i = 0; i < this.actors.length; i++) {
@@ -110,7 +107,7 @@ Level.prototype.playerTouched = function(type, actor) {
     var levelStatus = this.levelInfo.playerTouched(type, actor, this);
     if (levelStatus == "lost" || levelStatus == "won") {
         this.status = levelStatus;
-        this.finishDelay = 1;
+        this.finishDelay = 2;
     }
 };
 
@@ -188,6 +185,8 @@ var keys = trackKeys(keyCodes);
 function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level); // Clear display for each level.   
     var hud = new InGameHUD(document.body);
+    hud.addElement({ "type": MessageType.HEALTHBAR, "context": level.player, "funcToCall": "getHealth", maxValue: 100 });
+    Game.hud = hud;
     runAnimation(function(step) {
         level.animate(step, keys);
         display.drawFrame(step);

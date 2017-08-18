@@ -1,13 +1,7 @@
-var FLY_POWER_MAX = 3;
-
 function Player(pos) {
     this.pos = pos.plus(new Vector(0, -0.5));
     this.size = new Vector(0.8, 1.5);
     this.speed = new Vector(0, 0);
-    this.onKeyUpEnableDoubleJump = false;
-    this.enableDoubleJump = false;
-    this.fly = false;
-    this.flyPower = FLY_POWER_MAX;
     this.facingRight = true;
     this.health = 100;
     this.playerHitTimer = 0;
@@ -15,6 +9,9 @@ function Player(pos) {
 }
 Player.prototype.type = "player";
 
+Player.prototype.getHealth = function() {
+    return this.health;
+}
 
 var playerXSpeed = 7;
 // Set the speed.
@@ -133,22 +130,28 @@ Player.prototype.draw = function(cx, x, y) {
     }
     cx.restore();
 }
+var FLY_POWER_MAX = 3;
 
-function PlayerNonPlatform(pos) {
-    this.pos = pos.plus(new Vector(0, -0.5));
-    this.size = new Vector(0.8, 1.5);
-    this.speed = new Vector(0, 0);
-    this.facingRight = true;
-    this.facingUp = true;
-    this.health = 100;
-    this.playerHitTimer = 0;
-    this.playerHitTimerMax = 100;
+function PlayerPlatformer(pos) {
+    Player.call(this, pos);
+    this.onKeyUpEnableDoubleJump = false;
+    this.enableDoubleJump = false;
+    this.fly = false;
+    this.flyPower = FLY_POWER_MAX;
 }
-PlayerNonPlatform.prototype.type = "player_non_platformer";
 
-PlayerNonPlatform.prototype.draw = Player.prototype.draw;
+PlayerPlatformer.prototype = Object.create(Player.prototype);
 
-PlayerNonPlatform.prototype.move = function(step, level, keys) {
+function PlayerNonPlatformer(pos) {
+    Player.call(this, pos);
+    this.facingUp = true;
+}
+
+PlayerNonPlatformer.prototype = Object.create(Player.prototype);
+
+PlayerNonPlatformer.prototype.draw = Player.prototype.draw;
+
+PlayerNonPlatformer.prototype.move = function(step, level, keys) {
     this.speed.x = 0;
     this.speed.y = 0;
     var PLAYER_NON_PLATFORM_SPEED = 4;
@@ -179,17 +182,16 @@ PlayerNonPlatform.prototype.move = function(step, level, keys) {
     }
 };
 
-PlayerNonPlatform.prototype.act = Player.prototype.act;
+PlayerNonPlatformer.prototype.act = Player.prototype.act;
 
-// var Lava = function(posVector, char) {
-function Lava(pos, char) {
+function Lava(pos, character) {
     this.pos = pos;
     this.size = new Vector(1, 1);
-    if (char == "=") { // Horizontal lava
+    if (character == "=") { // Horizontal lava
         this.speed = new Vector(2, 0);
-    } else if (char == "|") { // Vertical up and down lava
+    } else if (character == "|") { // Vertical up and down lava
         this.speed = new Vector(0, 2);
-    } else if (char == "v") { // Dripping regenerating lava.
+    } else if (character == "v") { // Dripping regenerating lava.
         // Regenerating lava.
         this.speed = new Vector(0, 3);
         this.repeatPos = pos;
@@ -212,11 +214,10 @@ Lava.prototype.act = function(step, level) {
 
 Lava.prototype.draw = function(cx, x, y) {
     cx.save();
-    cx.fillStyle = "blue";
+    cx.fillStyle = "red";
     cx.fillRect(x, y, 20.5, 20);
     cx.restore();
 }
-
 
 var wobbleSpeed = 8,
     wobbleDist = 0.07;

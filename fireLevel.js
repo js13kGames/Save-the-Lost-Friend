@@ -24,30 +24,19 @@ var fireLevelMap = ["                                                           
     "                                                                                "
 ];
 
-function FireLava(pos, char) {
-    Lava.call(this, pos, char);
-}
-FireLava.prototype = Object.create(Lava.prototype);
-
-FireLava.prototype.draw = function(cx, x, y) {
-    cx.save();
-    cx.fillStyle = "red";
-    cx.fillRect(x, y, 20.5, 20);
-    cx.restore();
-}
-
 var fireLevelBackgroundChars = {
     "x": "wall",
     "!": "lava"
 };
 
 var fireLevelActorChars = {
-    "@": Player,
+    "@": PlayerPlatformer,
     "o": Coin,
-    "=": FireLava,
-    "|": FireLava,
-    "v": FireLava
+    "=": Lava,
+    "|": Lava,
+    "v": Lava
 };
+
 
 var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
 
@@ -66,7 +55,8 @@ fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
 };
 
 fireLevel.playerTouched = function(type, actor, level) {
-    if (type == "lava") {
+    if (type == "lava" && level.status == null) {
+        Game.hud.addElement({ "type": MessageType.GAME_MESSAGE, "message": "Lava killed you." });
         return "lost";
     } else if (type == "coin") { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
@@ -76,6 +66,8 @@ fireLevel.playerTouched = function(type, actor, level) {
         if (!level.actors.some(function(actor) {
                 return actor.type == "coin";
             })) {
+            Game.hud.clearHudObjects();
+            Game.hud.addElement({ "type": MessageType.GAME_MESSAGE, "message": "You Won!" });
             return "won";
         }
     }

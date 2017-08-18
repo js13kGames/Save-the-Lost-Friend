@@ -1,6 +1,6 @@
 var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeeeeeeeexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     "x                             eeeeeeeeee         l                               x",
-    "x                                                                                x",
+    "x                      l     s   s     s      l                                  x",
     "x         l          l                                  s      l                 x",
     "x                         s        l                                             x",
     "x                                                                                x",
@@ -24,7 +24,7 @@ var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeeeeeeeexxxxxxxxxxxxxxxxxx
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxwwwwwwwwwwxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ];
 
-function Island(pos, char) {
+function Island(pos, character) {
     this.pos = pos;
     this.size = new Vector(1, 1);
     this.color = null;
@@ -42,44 +42,54 @@ Island.prototype.act = function(step, level) {
 
 }
 
-function Earth(pos, char) {
-    Island.call(this, pos, char);
+function addDialog(islandType) {
+    this.dialog = new Dialog();
+    this.dialog.firstMessage = "Welcome to " + islandType + " island.";
+    this.dialog.restMessage = "Welcome to " + islandType + " island again.";
+}
+
+function Earth(pos, character) {
+    Island.call(this, pos, character);
     this.type = "earth";
     this.color = "brown";
+    addDialog.call(this, "earth");
 }
 Earth.prototype = Object.create(Island.prototype);
 
-function Water(pos, char) {
-    Island.call(this, pos, char);
+function Water(pos, character) {
+    Island.call(this, pos, character);
     this.type = "water";
     this.color = "green";
+    addDialog.call(this, "water");
 }
 Water.prototype = Object.create(Island.prototype);
 
-function Fire(pos, char) {
-    Island.call(this, pos, char);
+function Fire(pos, character) {
+    Island.call(this, pos, character);
     this.type = "fire";
     this.color = "red";
+    addDialog.call(this, "fire");
 }
 Fire.prototype = Object.create(Island.prototype);
 
-function Air(pos, char) {
-    Island.call(this, pos, char);
+function Air(pos, character) {
+    Island.call(this, pos, character);
     this.type = "air";
     this.color = "white";
+    addDialog.call(this, "air");
 }
 Air.prototype = Object.create(Island.prototype);
 
-function Shark(pos, char) {
+function Shark(pos, character) {
     this.pos = pos;
     this.size = new Vector(1, 1);
     this.dir = Math.random();
     if (this.dir > 0.5) {
-        this.speedX = ~~(Math.max(Math.random(), 0.2) * 6);
+        this.speedX = ~~(Math.max(Math.random(), 0.2) * 28);
         this.speedY = 0;
     } else {
         this.speedX = 0;
-        this.speedY = ~~(Math.max(Math.random(), 0.2) * 6);
+        this.speedY = ~~(Math.max(Math.random(), 0.2) * 28);
     }
     this.speed = new Vector(this.speedX, this.speedY);
 }
@@ -139,10 +149,10 @@ Shark.prototype.draw = function(cx, x, y) {
 
 
 function WaterPlayer(pos) {
-    PlayerNonPlatform.call(this, pos);
+    PlayerNonPlatformer.call(this, pos);
     this.health = 50;
 }
-WaterPlayer.prototype = Object.create(PlayerNonPlatform.prototype);
+WaterPlayer.prototype = Object.create(PlayerNonPlatformer.prototype);
 
 var waterLevelBackgroundChars = {
     "x": "wall",
@@ -157,6 +167,7 @@ var waterLevelActorChars = {
     "a": Air
 };
 
+
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelMap, waterLevelBackgroundChars, waterLevelActorChars);
 
 waterLevel.playerTouched = function(type, actor, level) {
@@ -164,11 +175,15 @@ waterLevel.playerTouched = function(type, actor, level) {
         if (level.player.playerHitTimer == 0) {
             level.player.health -= 10;
             level.player.playerHitTimer = level.player.playerHitTimerMax;
+            Game.hud.clearHudObjects();
+            Game.hud.addElement({ "type": MessageType.GAME_MESSAGE, "message": "Beware of the Sharks. Shark Attacked. " + level.player.health });
         }
-        console.log("Player health:" + level.player.health + " " + level.player.playerHitTimer);
         if (level.player.health <= 0) {
             return "lost"
         }
+    }
+    if (actor && actor.dialog) {
+        actor.dialog.speak();
     }
     if (type == "earth" && level.status == null) {
         return "won";
