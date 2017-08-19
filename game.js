@@ -3,7 +3,8 @@ var Game = {
     gamePaused: false,
     tileSize: 20,
     width: 1000,
-    height: 450
+    height: 450,
+    currentLevel: null
 };
 
 var Level = function(levelInfo) {
@@ -13,8 +14,17 @@ var Level = function(levelInfo) {
     this.height = plan.length;
     this.grid = [];
     this.actors = [];
-    this.dialogActors = [];
+    this.triggerGrid = [];
     var ch;
+    Game.currentLevel = this;
+    for (y = 0; y < this.height; y++) {
+        var line = [];
+        for (x = 0; x < this.width; x++) {
+            line.push(null);
+        }
+        this.triggerGrid.push(line);
+    }
+
     for (y = 0; y < this.height; y++) {
         var line = plan[y];
         var gridLine = [];
@@ -22,9 +32,11 @@ var Level = function(levelInfo) {
             var ch = line[x]; // Get the char.
             var fieldType = null;
             var Actor = levelInfo.actorChars[ch]; // Is it an dynamic item. Get the constructor for same.            
-            if (Actor)
-                this.actors.push(new Actor(new Vector(x, y), ch)); // Instantate the actor. Needs the vector,ch
-            else {
+            if (Actor) {
+                var currentActor = new Actor(new Vector(x, y), ch);
+                currentActor.id = this.actors.length;
+                this.actors.push(currentActor); // Instantate the actor. Needs the vector,ch            
+            } else {
                 fieldType = levelInfo.backgroundChars[ch];
             }
 
@@ -36,6 +48,13 @@ var Level = function(levelInfo) {
     this.player = this.actors.filter(function(actor) { // Get the player instance separately.
         return actor.type == "player";
     })[0];
+    var count = 0;
+    this.actors.forEach(function(actor) {
+        if (actor.hasDialog) {
+            updateTriggerRegion(actor);
+            count++;
+        }
+    });
     this.status = this.finishDelay = null;
 };
 
@@ -109,6 +128,36 @@ Level.prototype.playerTouched = function(type, actor) {
         this.status = levelStatus;
         this.finishDelay = 2;
     }
+};
+
+var getDirectionalPos = function(pos) {
+    var directionalPos = [];
+    directionalPos.push(new Vector(pos.x, pos.y - 1)); // N
+    directionalPos.push(new Vector(pos.x + 1, pos.y - 1)); // NE
+    directionalPos.push(new Vector(pos.x + 1, pos.y)); // E
+    directionalPos.push(new Vector(pos.x + 1, pos.y + 1)); // SE
+    directionalPos.push(new Vector(pos.x, pos.y + 1)); // S
+    directionalPos.push(new Vector(pos.x - 1, pos.y + 1)); // SW
+    directionalPos.push(new Vector(pos.x - 1, pos.y)); // W
+    directionalPos.push(new Vector(pos.x - 1, pos.y - 1)); // NW
+    return directionalPos;
+}
+
+var updateTriggerRegion = function(actor) {
+    var pos = actor.pos;
+    var actorId = actor.id;
+    var directionalPos = getDirectionalPos(pos);
+    directionalPos = directionalPos.filter(function(vec) {
+        if (vec.x < Game.currentLevel.width && vec.x > 0 &&
+            vec.y < Game.currentLevel.height && vec.y > 0) {
+            if (!Game.currentLevel.grid[vec.y][vec.x]) {
+                return true;
+            }
+        }
+    });
+    directionalPos.forEach(function(vec) {
+        Game.currentLevel.triggerGrid[vec.y][vec.x] = actorId;
+    });
 };
 
 var Vector = function(x, y) {
@@ -193,6 +242,7 @@ function runLevel(level, Display, andThen) {
         hud.draw();
         if (level.isFinished()) {
             display.clear();
+            hud.clear();
             if (andThen) {
                 andThen(level.status);
             }

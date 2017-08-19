@@ -1,10 +1,6 @@
 var MessageType = { "HEALTHBAR": 0, "GAME_MESSAGE": 1 };
 
 function InGameHUD(parent) {
-    var existingHud = document.getElementById("hud");
-    if (existingHud) {
-        existingHud.parentNode.removeChild(existingHud);
-    }
     this.canvas = document.createElement("canvas");
     this.canvas.id = "hud";
     this.canvas.width = Game.width;
@@ -46,6 +42,10 @@ InGameHUD.prototype.drawGameMessage = function(message) {
     this.cx.fillStyle = "fuchsia";
     this.cx.fillText(message, x + textOffsetX, y + textOffsetY + textHeight);
 }
+
+InGameHUD.prototype.clear = function() {
+    this.canvas.parentNode.removeChild(this.canvas);
+};
 
 // Remove an element to be drawn.
 InGameHUD.prototype.removeElement = function(elem) {

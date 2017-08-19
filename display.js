@@ -5,10 +5,6 @@ function flipHorizontally(context, around) {
 }
 
 function CanvasDisplay(parent, level) {
-    var existingGameScreen = document.getElementById("gameScreen");
-    if (existingGameScreen) {
-        existingGameScreen.parentNode.removeChild(existingGameScreen);
-    }
     this.canvas = document.createElement("canvas");
     this.canvas.id = "gameScreen";
     this.canvas.width = Math.min(Game.width, level.width * Game.scale);
@@ -42,6 +38,7 @@ CanvasDisplay.prototype.drawFrame = function(step) {
     this.clearDisplay();
     this.drawBackground();
     this.drawActors();
+    this.drawTriggerPoints();
 };
 
 CanvasDisplay.prototype.updateViewport = function() {
@@ -104,4 +101,25 @@ CanvasDisplay.prototype.drawActors = function() {
     var x = (this.level.player.pos.x - this.viewport.left) * Game.scale;
     var y = (this.level.player.pos.y - this.viewport.top) * Game.scale;
     this.level.player.draw(this.cx, x, y);
+};
+
+CanvasDisplay.prototype.drawTriggerPoints = function() {
+    var view = this.viewport;
+    var xStart = Math.floor(view.left);
+    var xEnd = Math.ceil(view.left + view.width);
+    var yStart = Math.floor(view.top);
+    var yEnd = Math.ceil(view.top + view.height);
+
+    for (var y = yStart; y < yEnd; y++) {
+        for (var x = xStart; x < xEnd; x++) {
+            var tile = this.level.triggerGrid[y][x];
+            if (tile == null) continue;
+            var screenX = (x - view.left) * Game.scale;
+            var screenY = (y - view.top) * Game.scale;
+            this.cx.save();
+            this.cx.fillStyle = "#ff00ff";
+            this.cx.fillRect(screenX, screenY, 20, 20);
+            this.cx.restore();
+        }
+    }
 };

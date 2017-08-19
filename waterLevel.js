@@ -29,6 +29,7 @@ function Island(pos, character) {
     this.size = new Vector(1, 1);
     this.color = null;
     this.type = null;
+    this.hasDialog = true;
 }
 
 Island.prototype.draw = function(cx, x, y) {
@@ -183,7 +184,7 @@ waterLevel.playerTouched = function(type, actor, level) {
         }
     }
     if (actor && actor.dialog) {
-        actor.dialog.speak();
+        //actor.dialog.speak();
     }
     if (type == "earth" && level.status == null) {
         return "won";
