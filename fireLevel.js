@@ -56,7 +56,7 @@ fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
 
 fireLevel.playerTouched = function(type, actor, level) {
     if (type == "lava" && level.status == null) {
-        Game.hud.addElement({ "type": MessageType.GAME_MESSAGE, "message": "Lava killed you." });
+        Game.hud.setGameMessage("Lava killed you.");
         return "lost";
     } else if (type == "coin") { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
@@ -66,8 +66,7 @@ fireLevel.playerTouched = function(type, actor, level) {
         if (!level.actors.some(function(actor) {
                 return actor.type == "coin";
             })) {
-            Game.hud.clearHudObjects();
-            Game.hud.addElement({ "type": MessageType.GAME_MESSAGE, "message": "You Won!" });
+            Game.hud.setGameMessage("You Won!");
             return "won";
         }
     }

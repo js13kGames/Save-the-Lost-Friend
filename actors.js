@@ -6,6 +6,10 @@ function Player(pos) {
     this.health = 100;
     this.playerHitTimer = 0;
     this.playerHitTimerMax = 100;
+    this.skipDialogTimer = 0;
+    this.skipDialogTimerMax = 200;
+
+
 }
 Player.prototype.type = "player";
 
@@ -94,7 +98,9 @@ Player.prototype.move = function(step, level, keys) {
 // If yes call playerTouched
 // status is lost losing animation.
 Player.prototype.act = function(step, level, keys) {
-    this.move(step, level, keys);
+    if (!Game.inInteraction) {
+        this.move(step, level, keys);
+    }
     // Check for collisions with dynamic layer.
     var collidedObject = level.actorAt(this);
     if (collidedObject)
@@ -102,6 +108,13 @@ Player.prototype.act = function(step, level, keys) {
     if (level.status == "lost") { // Losing animation.
         this.pos.y += step;
         this.size.y -= step;
+    }
+
+    var triggerObject = level.triggerAt(this.pos, this.size);
+    if (triggerObject) {
+        level.levelInfo.playerInteract(triggerObject, level);
+    } else {
+        Game.inGameMessage = false;
     }
     if (keys.fly) {
         this.fly = true;
@@ -111,6 +124,9 @@ Player.prototype.act = function(step, level, keys) {
     }
     if (level.player.playerHitTimer > 0) {
         level.player.playerHitTimer--;
+    }
+    if (level.player.skipDialogTimer > 0) {
+        level.player.skipDialogTimer--;
     }
 };
 

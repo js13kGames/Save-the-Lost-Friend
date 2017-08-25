@@ -3,8 +3,10 @@ var Game = {
     gamePaused: false,
     tileSize: 20,
     width: 1000,
-    height: 450,
-    currentLevel: null
+    height: 420,
+    currentLevel: null,
+    inInteraction: false,
+    inGameMessage: false
 };
 
 var Level = function(levelInfo) {
@@ -33,15 +35,11 @@ var Level = function(levelInfo) {
             var fieldType = null;
             var Actor = levelInfo.actorChars[ch]; // Is it an dynamic item. Get the constructor for same.            
             if (Actor) {
-                var currentActor = new Actor(new Vector(x, y), ch);
-                currentActor.id = this.actors.length;
-                this.actors.push(currentActor); // Instantate the actor. Needs the vector,ch            
+                this.actors.push(new Actor(new Vector(x, y), ch)); // Instantate the actor. Needs the vector,ch            
             } else {
                 fieldType = levelInfo.backgroundChars[ch];
             }
-
             gridLine.push(fieldType);
-
         }
         this.grid.push(gridLine); // Push the field type.
     }
@@ -107,6 +105,24 @@ Level.prototype.actorAt = function(actor) {
     }
 }
 
+// Collision with the trigger location of any dialog enabled actor.
+Level.prototype.triggerAt = function(pos, size) {
+    var xStart = Math.floor(pos.x);
+    var xEnd = Math.ceil(pos.x + size.x);
+    var yStart = Math.floor(pos.y);
+    var yEnd = Math.ceil(pos.y + size.y);
+
+    //  Is there any obstacle overlapping the players bounding box.
+    for (var y = yStart; y < yEnd; y++) {
+        for (var x = xStart; x < xEnd; x++) {
+            var fieldType = this.triggerGrid[y][x];
+            if (fieldType) {
+                return fieldType
+            }
+        }
+    }
+}
+
 var maxStep = 0.05;
 // Get the minimal step size. Call the actor.act for each of the dynamic objects.
 Level.prototype.animate = function(step, keys) {
@@ -156,7 +172,7 @@ var updateTriggerRegion = function(actor) {
         }
     });
     directionalPos.forEach(function(vec) {
-        Game.currentLevel.triggerGrid[vec.y][vec.x] = actorId;
+        Game.currentLevel.triggerGrid[vec.y][vec.x] = actor;
     });
 };
 
@@ -173,24 +189,35 @@ Vector.prototype.times = function(scaleNos) {
     return new Vector(scaleNos * this.x, scaleNos * this.y);
 };
 
-var keyCodes = { 37: "left", 38: "up", 39: "right", 40: "down", 70: "fly", 71: "revokeFly", 80: "pause" };
+var keyCodes = {
+    37: "left",
+    38: "up",
+    39: "right",
+    40: "down",
+    70: "fly",
+    71: "revokeFly",
+    80: "pause",
+    27: "skip",
+    13: "enter"
+};
 
 // Create the key handler func & register for the keydown and keyup.
 var trackKeys = function(codes) {
     var pressed = {};
-    //var pressed = Object.create(null);
+    var keyReleased = {};
 
     function handler(event) {
-        // console.log(event.keyCode);
         if (codes.hasOwnProperty(event.keyCode)) {
             var down = event.type == "keydown";
+            var up = event.type == "keyup";
             pressed[codes[event.keyCode]] = down;
+            keyReleased[codes[event.keyCode]] = up;
             event.preventDefault();
         }
     }
     addEventListener("keydown", handler);
     addEventListener("keyup", handler);
-    return pressed;
+    return { "down": pressed, "up": keyReleased };
 }
 
 var pauseIsDown = false;
@@ -227,14 +254,22 @@ var runAnimation = function(frameFunc) { // frameFunc  anonymous func.
     requestAnimationFrame(frame);
 };
 
-var keys = trackKeys(keyCodes);
+var keyUpDown = trackKeys(keyCodes);
+var keys = keyUpDown["down"];
+var keyPressed = keyUpDown["up"];
+
+var resetKeyPressed = function() {
+    keyPressed.up = false;
+    keyPressed.down = false;
+    keyPressed.enter = false;
+}
 
 // Called from runGame.
 // Calls runAnimation function with an anonymous func as parameter
 function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level); // Clear display for each level.   
     var hud = new InGameHUD(document.body);
-    hud.addElement({ "type": MessageType.HEALTHBAR, "context": level.player, "funcToCall": "getHealth", maxValue: 100 });
+    hud.setHealthBar(level.player, "getHealth", 100);
     Game.hud = hud;
     runAnimation(function(step) {
         level.animate(step, keys);
