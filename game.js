@@ -1,14 +1,3 @@
-var Game = {
-    scale: 20,
-    gamePaused: false,
-    tileSize: 20,
-    width: 1000,
-    height: 420,
-    currentLevel: null,
-    inInteraction: false,
-    inGameMessage: false
-};
-
 var Level = function(levelInfo) {
     var plan = levelInfo.level;
     this.levelInfo = levelInfo;
@@ -17,6 +6,7 @@ var Level = function(levelInfo) {
     this.grid = [];
     this.actors = [];
     this.triggerGrid = [];
+    this.islandGrid = [];
     var ch;
     Game.currentLevel = this;
     for (y = 0; y < this.height; y++) {
@@ -30,18 +20,25 @@ var Level = function(levelInfo) {
     for (y = 0; y < this.height; y++) {
         var line = plan[y];
         var gridLine = [];
+        var islandLine = [];
         for (x = 0; x < this.width; x++) {
             var ch = line[x]; // Get the char.
             var fieldType = null;
+            var islandFieldType = null;
             var Actor = levelInfo.actorChars[ch]; // Is it an dynamic item. Get the constructor for same.            
             if (Actor) {
-                this.actors.push(new Actor(new Vector(x, y), ch)); // Instantate the actor. Needs the vector,ch            
+                this.actors.push(new Actor(new Vector(x, y), ch)); // Instantate the actor. Needs the vector,ch
+                if (ch == "q") {
+                    islandFieldType = levelInfo.actorChars[ch];
+                }
             } else {
                 fieldType = levelInfo.backgroundChars[ch];
             }
             gridLine.push(fieldType);
+            islandLine.push(islandFieldType);
         }
         this.grid.push(gridLine); // Push the field type.
+        this.islandGrid.push(islandLine);
     }
     this.player = this.actors.filter(function(actor) { // Get the player instance separately.
         return actor.type == "player";
@@ -88,6 +85,23 @@ Level.prototype.obstacleAt = function(pos, size) {
 
 }
 
+Level.prototype.islandStructAt = function(pos, size) {
+    var xStart = Math.floor(pos.x);
+    var xEnd = Math.ceil(pos.x + size.x);
+    var yStart = Math.floor(pos.y);
+    var yEnd = Math.ceil(pos.y + size.y);
+
+    //  Is there any island obstacle overlapping the players bounding box.
+    for (var y = yStart; y < yEnd; y++) {
+        for (var x = xStart; x < xEnd; x++) {
+            var fieldType = this.islandGrid[y][x];
+            if (fieldType) {
+                return fieldType
+            }
+        }
+    }
+
+}
 
 // Collision with any other dynamic object.
 Level.prototype.actorAt = function(actor) {
@@ -146,19 +160,6 @@ Level.prototype.playerTouched = function(type, actor) {
     }
 };
 
-var getDirectionalPos = function(pos) {
-    var directionalPos = [];
-    directionalPos.push(new Vector(pos.x, pos.y - 1)); // N
-    directionalPos.push(new Vector(pos.x + 1, pos.y - 1)); // NE
-    directionalPos.push(new Vector(pos.x + 1, pos.y)); // E
-    directionalPos.push(new Vector(pos.x + 1, pos.y + 1)); // SE
-    directionalPos.push(new Vector(pos.x, pos.y + 1)); // S
-    directionalPos.push(new Vector(pos.x - 1, pos.y + 1)); // SW
-    directionalPos.push(new Vector(pos.x - 1, pos.y)); // W
-    directionalPos.push(new Vector(pos.x - 1, pos.y - 1)); // NW
-    return directionalPos;
-}
-
 var updateTriggerRegion = function(actor) {
     var pos = actor.pos;
     var actorId = actor.id;
@@ -174,19 +175,6 @@ var updateTriggerRegion = function(actor) {
     directionalPos.forEach(function(vec) {
         Game.currentLevel.triggerGrid[vec.y][vec.x] = actor;
     });
-};
-
-var Vector = function(x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-Vector.prototype.plus = function(Vec1) {
-    return new Vector(this.x + Vec1.x, this.y + Vec1.y);
-};
-
-Vector.prototype.times = function(scaleNos) {
-    return new Vector(scaleNos * this.x, scaleNos * this.y);
 };
 
 var keyCodes = {

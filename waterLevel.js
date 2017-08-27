@@ -1,29 +1,15 @@
-var waterLevelMap = ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeeeeeeeexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "x                             eeeeEeeeee         l                               x",
-    "x                      l     s   s     s      l                                  x",
-    "x         l          l                                  s      l                 x",
-    "x                         s        l                                             x",
-    "x                                                                                x",
-    "x   l                                                l                           x",
-    "x                                                                                x",
-    "x                     l                                        l                 x",
-    "x          l                                     s                               x",
-    "aa    l              l                  @                                       ff",
-    "aa                 l               l                       B                    ff",
-    "aa                                                 l              l             Ff",
-    "aA     l               s                                                        ff",
-    "aa                              l                             l                 ff",
-    "aa                                                                              ff",
-    "x                                          l             s                       x",
-    "x              l                                               l                 x",
-    "x                               s                                                x",
-    "x  l      l                     l                                                x",
-    "x                                                                                x",
-    "x                                           l                                    x",
-    "x                              wwwwWwwwww                             l          x",
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxwwwwwwwwwwxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-];
+var rowWidth = 88;
+var rowHeight = 22;
+var isLandSizePercent = .2;
+var islandFixedSize = ~~(rowWidth * isLandSizePercent);
+var islandVertFixedSize = ~~(rowHeight * isLandSizePercent);
+var horizIslandStartPoint = ~~(rowWidth / 2 - islandFixedSize / 2);
+var vertIslandStartPoint = ~~(rowHeight / 2 - islandVertFixedSize / 2);
+var remSharkPercent = .995; // 1 percent of sharks.
+var remLogPercent = .99; // 5 percent of logs
+var numberOfTilesInIsland = 20;
 
+waterLevelPlan = createPlan(rowWidth, rowHeight, isLandSizePercent, remSharkPercent, remLogPercent, numberOfTilesInIsland);
 
 function SignBoard(pos, character, type, color) {
     this.pos = pos;
@@ -78,7 +64,7 @@ AirSignBoard.prototype = Object.create(SignBoard.prototype);
 function Bird(pos, character) {
     this.pos = pos;
     this.size = new Vector(1, 1);
-    this.color = "cream";
+    this.color = "black";
     this.hasDialog = true;
     this.dialog = new Dialog();
     this.dialog.messages = birdDialogue;
@@ -96,6 +82,27 @@ Bird.prototype.act = function(step, level) {
 }
 
 Bird.prototype.type = "bird";
+
+function islandStruct(pos, character) {
+    this.pos = pos;
+    this.size = new Vector(1, 1);
+    this.color = "pink";
+    this.character = character;
+}
+
+islandStruct.prototype.draw = function(cx, x, y) {
+    cx.save();
+    cx.fillStyle = this.color;
+    cx.fillRect(x, y, Game.scale, Game.scale);
+    cx.restore();
+}
+
+islandStruct.prototype.act = function(step, level) {
+
+}
+islandStruct.prototype.type = "islandStruct";
+
+
 
 function Shark(pos, character) {
     this.pos = pos;
@@ -116,10 +123,11 @@ Shark.prototype.type = "shark";
 // Called at every step of the animate.
 Shark.prototype.act = function(step, level) {
     var newPos = this.pos.plus(this.speed.times(step)); // Calculate newPos
-    if (!level.obstacleAt(newPos, this.size)) { // If no obstacle set newPos
-        this.pos = newPos
+    if (!level.obstacleAt(newPos, this.size) && !level.islandStructAt(newPos, this.size)) // If no obstacle
+    { // If no island struct.
+        this.pos = newPos;
     } else {
-        this.speed = this.speed.times(-1);
+        this.speed = this.speed.times(-1); // else change direction.
     }
 };
 
@@ -195,6 +203,7 @@ var waterLevelBackgroundChars = {
     "f": "fire",
     "a": "air"
 };
+
 var waterLevelActorChars = {
     "@": WaterPlayer,
     "s": Shark,
@@ -202,11 +211,14 @@ var waterLevelActorChars = {
     "E": EarthSignBoard,
     "F": FireSignBoard,
     "A": AirSignBoard,
-    "B": Bird
+    "q": islandStruct,
+    "B": Bird,
+    "T": Bird, //Turtle
+    "C": Bird, // Crab
+    "U": Bird // Eagle
 };
 
-
-var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelMap, waterLevelBackgroundChars, waterLevelActorChars);
+var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars);
 
 waterLevel.playerTouched = function(type, actor, level) {
     if ((type == "shark") && (level.status == null)) {
