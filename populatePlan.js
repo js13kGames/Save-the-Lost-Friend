@@ -10,9 +10,9 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
     }
 
     // y holds the rows (height), x the columns (width)
-    function setChar(x, y, char) {
-        //console.log(x, y, char);
-        plan[y][x] = char;
+    function setChar(x, y, charSymbol) {
+        //console.log(x, y, charSymbol);
+        plan[y][x] = charSymbol;
     }
 
     // Top and bottom walls, island , Earth and Water sign posts

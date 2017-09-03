@@ -122,7 +122,7 @@ var crabDialogue = {
             "question": "Fish?  How am I supposed to know you need fish. ",
             "answer": "You promised me the last time you were here and the time before too.",
             "askedStatus": 0
-        },
+        }
     }, // end of batch 1
     "1": {
         "welcomeMessage": "How can you forget my fish?",
@@ -162,7 +162,7 @@ var eagleDialogue = {
             "question": "Iam searching for my lost friend. Can you help me ",
             "answer": "Why it was only some time back when some one was searching for his lost friend.? Smells familiar.",
             "askedStatus": 0
-        },
+        }
     }, // end of batch 1
     "1": {
         "welcomeMessage": "I remember you were here to rescue your friend.",
@@ -227,7 +227,7 @@ var owlDialogue = {
             "question": "Why do doubt my survival? ",
             "answer": "I sense the quest to be a difficult and life threatening one.",
             "askedStatus": 0
-        },
+        }
 
     }, // end of batch 1
     "1": {
