@@ -7,6 +7,7 @@ var Level = function(levelInfo) {
     this.actors = [];
     this.triggerGrid = [];
     this.islandGrid = [];
+
     var ch;
     Game.currentLevel = this;
     for (y = 0; y < this.height; y++) {
@@ -49,7 +50,7 @@ var Level = function(levelInfo) {
             updateTriggerRegion(actor);
             count++;
         }
-    });
+    }, this);
     this.status = this.finishDelay = null;
 };
 
@@ -58,6 +59,25 @@ Level.prototype.isFinished = function() {
     return ((this.status != null) && (this.finishDelay < 0));
 };
 
+Level.prototype.activateNextTriggerObject = function(type) {
+
+    var curIndex = this.levelInfo.dialogEnableSequence.indexOf(type);
+    console.log("type" + " " + type + " " + curIndex);
+    if (curIndex < this.levelInfo.dialogEnableSequence.length) {
+        console.log("In curIndex." + curIndex);
+        var newType = this.levelInfo.dialogEnableSequence[curIndex + 1];
+        console.log("New type." + newType);
+        for (var i = 0; i < this.actors.length; i++) {
+            if (this.actors[i].type == newType) {
+                console.log("Activated for", this.actors[i].type);
+                this.actors[i].isActivated = true;
+                break
+            }
+        }
+
+    }
+
+}
 
 // Check if there is any object in the static layer at the given bounding box of pos and size.
 Level.prototype.obstacleAt = function(pos, size) {

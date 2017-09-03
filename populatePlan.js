@@ -203,7 +203,7 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
         var playerX = ~~(2 + Math.random() * (rowWidth / 2));
         var playerY = ~~(rowHeight / 2 + Math.random() * (rowHeight - 2) / 2);
 
-        if (plan[playerY][playerX] == null) {
+        if (plan[playerY][playerX] == null && plan[playerY - 1][playerX] == null) {
             setChar(playerX, playerY, "@");
             break;
         }

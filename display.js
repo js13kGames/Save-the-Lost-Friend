@@ -89,6 +89,7 @@ CanvasDisplay.prototype.drawBackground = function() {
     }
 };
 
+/*
 CanvasDisplay.prototype.drawActors = function() {
     this.level.actors.forEach(function(actor) {
         var width = actor.size.x * Game.scale;
@@ -102,6 +103,22 @@ CanvasDisplay.prototype.drawActors = function() {
     var y = (this.level.player.pos.y - this.viewport.top) * Game.scale;
     this.level.player.draw(this.cx, x, y);
 };
+*/
+
+CanvasDisplay.prototype.drawActors = function() {
+    this.level.actors.sort(function(actor1, actor2) {
+        return (actor1.pos.y < actor2.pos.y);
+    });
+
+    this.level.actors.forEach(function(actor) {
+        var width = actor.size.x * Game.scale;
+        var height = actor.size.y * Game.scale;
+        var x = (actor.pos.x - this.viewport.left) * Game.scale;
+        var y = (actor.pos.y - this.viewport.top) * Game.scale;
+        // if (actor.type != "player")
+        actor.draw(this.cx, x, y);
+    }, this);
+}
 
 CanvasDisplay.prototype.drawTriggerPoints = function() {
     var view = this.viewport;
