@@ -38,7 +38,6 @@ CanvasDisplay.prototype.drawFrame = function(step) {
     this.clearDisplay();
     this.drawBackground();
     this.drawActors();
-    this.drawTriggerPoints();
 };
 
 CanvasDisplay.prototype.updateViewport = function() {
@@ -119,24 +118,3 @@ CanvasDisplay.prototype.drawActors = function() {
         actor.draw(this.cx, x, y);
     }, this);
 }
-
-CanvasDisplay.prototype.drawTriggerPoints = function() {
-    var view = this.viewport;
-    var xStart = Math.floor(view.left);
-    var xEnd = Math.ceil(view.left + view.width);
-    var yStart = Math.floor(view.top);
-    var yEnd = Math.ceil(view.top + view.height);
-
-    for (var y = yStart; y < yEnd; y++) {
-        for (var x = xStart; x < xEnd; x++) {
-            var tile = this.level.triggerGrid[y][x];
-            if (tile == null) continue;
-            var screenX = (x - view.left) * Game.scale;
-            var screenY = (y - view.top) * Game.scale;
-            this.cx.save();
-            this.cx.fillStyle = "#ff00ff";
-            this.cx.fillRect(screenX, screenY, 20, 20);
-            this.cx.restore();
-        }
-    }
-};

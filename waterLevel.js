@@ -17,6 +17,7 @@ function SignBoard(pos, character, type, color) {
     this.color = color;
     this.type = type;
     this.hasDialog = true;
+    this.isActivated = true;
     addSignPostDialog.call(this, type);
 }
 
@@ -124,7 +125,6 @@ islandStruct.prototype.act = function(step, level) {
 islandStruct.prototype.type = "islandStruct";
 
 
-
 function Shark(pos, character) {
     this.pos = pos;
     this.size = new Vector(1, 1);
@@ -144,7 +144,7 @@ Shark.prototype.type = "shark";
 // Called at every step of the animate.
 Shark.prototype.act = function(step, level) {
     var newPos = this.pos.plus(this.speed.times(step)); // Calculate newPos
-    if (!level.obstacleAt(newPos, this.size) && !level.islandStructAt(newPos, this.size)) // If no obstacle
+    if (!level.collisionWith(newPos, this.size, "obstacle") && !level.collisionWith(newPos, this.size, "island")) // If no obstacle
     { // If no island struct.
         this.pos = newPos;
     } else {
@@ -157,54 +157,46 @@ Shark.prototype.draw = function(cx, x, y) {
     cx.fillStyle = "grey";
     if (this.speed.x != 0) {
         cx.fillRect(x, y, 20, 10);
+        cx.beginPath();
+        cx.strokeStyle = "white";
         if (this.speed.x > 0) {
-            cx.beginPath();
-            cx.strokeStyle = "white";
             cx.moveTo(x, y);
             cx.lineTo(x - 50, y - 20);
             cx.moveTo(x, y + 10);
             cx.lineTo(x - 50, y + 30);
             cx.moveTo(x + 20, y);
             cx.quadraticCurveTo(x + 40, y + 5, x + 20, y + 10);
-            cx.stroke();
-            cx.fill();
         } else {
-            cx.beginPath();
-            cx.strokeStyle = "white";
             cx.moveTo(x + 20, y);
             cx.lineTo(x + 50, y - 20);
             cx.moveTo(x + 20, y + 10);
             cx.lineTo(x + 50, y + 30);
             cx.moveTo(x, y);
             cx.quadraticCurveTo(x - 20, y + 5, x, y + 10);
-            cx.stroke();
-            cx.fill();
         }
-
+        cx.stroke();
+        cx.fill();
     } else {
         cx.fillRect(x, y, 10, 20);
+        cx.beginPath();
+        cx.strokeStyle = "white";
         if (this.speed.y > 0) {
-            cx.beginPath();
-            cx.strokeStyle = "white";
             cx.moveTo(x, y);
             cx.lineTo(x - 20, y - 50);
             cx.moveTo(x + 10, y);
             cx.lineTo(x + 30, y - 50);
             cx.moveTo(x, y + 20);
             cx.quadraticCurveTo(x + 5, y + 40, x + 10, y + 20);
-            cx.stroke();
-            cx.fill();
         } else {
-            cx.strokeStyle = "white";
             cx.moveTo(x, y + 20);
             cx.lineTo(x - 20, y + 50);
             cx.moveTo(x + 10, y + 20);
             cx.lineTo(x + 30, y + 50);
             cx.moveTo(x, y);
             cx.quadraticCurveTo(x + 5, y - 20, x + 10, y);
-            cx.stroke();
-            cx.fill();
         }
+        cx.stroke();
+        cx.fill();
     }
     cx.restore();
 }
@@ -263,81 +255,83 @@ waterLevel.playerTouched = function(type, actor, level) {
 };
 
 waterLevel.playerInteract = function(triggerObject, level) {
-    if (triggerObject.isActivated == true) {
-        var dialogObject = triggerObject.dialog.getNextQuestionBatch();
+    if (triggerObject.isActivated == false) {
+        return;
+    }
+
+    var dialogObject = triggerObject.dialog.getNextQuestionBatch();
+    Game.numberOfQuestions = Object.keys(dialogObject).length - 1;
+
+    if (Game.numberOfQuestions == 0 && !Game.inGameMessage) {
+        Game.hud.clearScreen();
+        Game.inGameMessage = true;
+        Game.hud.setGameMessage(dialogObject.welcomeMessage);
+    } else if (!Game.inInteraction && Game.numberOfQuestions != 0 &&
+        level.player.skipDialogTimer <= 0) {
+        Game.inInteraction = true;
+        Game.currentQuestionNo = 0;
+        Game.hud.clearScreen();
+        Game.hud.setGameMessage(dialogObject.welcomeMessage, true);
+        Game.inQuestion = false;
+        Game.nextQuestionReady = false;
+    }
+
+    if (keys.skip) {
+        Game.hud.clearScreen();
+        Game.hud.setGameMessage("", true);
+        Game.inInteraction = false;
+        level.player.skipDialogTimer = level.player.skipDialogTimerMax;
+    }
+    if (dialogObject && Game.numberOfQuestions != 0) {
+        if (keyPressed.up && Game.inQuestion) {
+            Game.currentQuestionNo--;
+            Game.hud.drawQuestions(dialogObject);
+            resetKeyPressed();
+        }
+        if (keyPressed.down && Game.inQuestion) {
+            Game.currentQuestionNo++;
+            Game.hud.drawQuestions(dialogObject);
+            resetKeyPressed();
+        }
+        if (keyPressed.enter) {
+            if (Game.inQuestion) {
+                Game.hud.clearScreen();
+                Game.hud.setGameMessage(dialogObject[Game.currentQuestionNo].answer, true);
+                dialogObject[Game.currentQuestionNo].askedStatus = 1;
+                Game.inQuestion = false;
+            } else {
+                Game.inQuestion = true;
+                Game.hud.setGameMessage("", true);
+                Game.hud.clearScreen();
+                if (!Game.nextQuestionReady) {
+                    Game.hud.drawQuestions(dialogObject);
+                }
+            }
+            if (Game.nextQuestionReady) {
+                Game.nextQuestionReady = false;
+                Game.inInteraction = false;
+            }
+            resetKeyPressed();
+        }
+
+    }
+    var unAnsweredQ = 0;
+    for (var i = 0; i < Game.numberOfQuestions; i++) {
+        if (dialogObject["" + i].askedStatus == 0) {
+            unAnsweredQ++;
+        }
+    }
+    if (unAnsweredQ == 0 && triggerObject.dialog.lastBatch()) { // TO-DO need to ensure it is activated only once
+        // Activate the next trigger object.            
+        level.activateNextTriggerObject(triggerObject.type);
+    }
+    if (unAnsweredQ == 0 && !triggerObject.dialog.lastBatch()) {
+        triggerObject.dialog.setNextQuestionBatch();
+        dialogObject = triggerObject.dialog.getNextQuestionBatch();
+        Game.currentQuestionNo = 0;
         Game.numberOfQuestions = Object.keys(dialogObject).length - 1;
-
-        if (Game.numberOfQuestions == 0 && !Game.inGameMessage) {
-            Game.hud.clearScreen();
-            Game.inGameMessage = true;
-            Game.hud.setGameMessage(dialogObject.welcomeMessage);
-        } else if (!Game.inInteraction && Game.numberOfQuestions != 0 &&
-            level.player.skipDialogTimer <= 0) {
-            Game.inInteraction = true;
-            Game.currentQuestionNo = 0;
-            Game.hud.clearScreen();
-            Game.hud.setGameMessage(dialogObject.welcomeMessage, true);
-            Game.inQuestion = false;
-            Game.nextQuestionReady = false;
-        }
-
-        if (keys.skip) {
-            Game.hud.clearScreen();
-            Game.hud.setGameMessage("", true);
-            Game.inInteraction = false;
-            level.player.skipDialogTimer = level.player.skipDialogTimerMax;
-        }
-        if (dialogObject && Game.numberOfQuestions != 0) {
-            if (keyPressed.up && Game.inQuestion) {
-                Game.currentQuestionNo--;
-                Game.hud.drawQuestions(dialogObject);
-                resetKeyPressed();
-            }
-            if (keyPressed.down && Game.inQuestion) {
-                Game.currentQuestionNo++;
-                Game.hud.drawQuestions(dialogObject);
-                resetKeyPressed();
-            }
-            if (keyPressed.enter) {
-                if (Game.inQuestion) {
-                    Game.hud.clearScreen();
-                    Game.hud.setGameMessage(dialogObject[Game.currentQuestionNo].answer, true);
-                    dialogObject[Game.currentQuestionNo].askedStatus = 1;
-                    Game.inQuestion = false;
-                } else {
-                    Game.inQuestion = true;
-                    Game.hud.setGameMessage("", true);
-                    Game.hud.clearScreen();
-                    if (!Game.nextQuestionReady) {
-                        Game.hud.drawQuestions(dialogObject);
-                    }
-                }
-                if (Game.nextQuestionReady) {
-                    Game.nextQuestionReady = false;
-                    Game.inInteraction = false;
-                }
-                resetKeyPressed();
-            }
-
-        }
-        var unAnsweredQ = 0;
-        for (var i = 0; i < Game.numberOfQuestions; i++) {
-            if (dialogObject["" + i].askedStatus == 0) {
-                unAnsweredQ++;
-            }
-        }
-        if (unAnsweredQ == 0 && triggerObject.dialog.lastBatch()) { // TO-DO need to ensure it is activated only once
-            // Activate the next trigger object.            
-            level.activateNextTriggerObject(triggerObject.type);
-        }
-        if (unAnsweredQ == 0 && !triggerObject.dialog.lastBatch()) {
-            triggerObject.dialog.setNextQuestionBatch();
-            dialogObject = triggerObject.dialog.getNextQuestionBatch();
-            Game.currentQuestionNo = 0;
-            Game.numberOfQuestions = Object.keys(dialogObject).length - 1;
-            Game.nextQuestionReady = true;
-        }
-    } // end if Activated is true.
+        Game.nextQuestionReady = true;
+    }
 
 };
 

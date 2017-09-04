@@ -60,61 +60,38 @@ Level.prototype.isFinished = function() {
 };
 
 Level.prototype.activateNextTriggerObject = function(type) {
-
     var curIndex = this.levelInfo.dialogEnableSequence.indexOf(type);
-    console.log("type" + " " + type + " " + curIndex);
     if (curIndex < this.levelInfo.dialogEnableSequence.length) {
-        console.log("In curIndex." + curIndex);
         var newType = this.levelInfo.dialogEnableSequence[curIndex + 1];
-        console.log("New type." + newType);
         for (var i = 0; i < this.actors.length; i++) {
             if (this.actors[i].type == newType) {
-                console.log("Activated for", this.actors[i].type);
                 this.actors[i].isActivated = true;
                 break
             }
         }
-
     }
-
 }
 
 // Check if there is any object in the static layer at the given bounding box of pos and size.
-Level.prototype.obstacleAt = function(pos, size) {
+Level.prototype.collisionWith = function(pos, size, type) {
     var xStart = Math.floor(pos.x);
     var xEnd = Math.ceil(pos.x + size.x);
     var yStart = Math.floor(pos.y);
     var yEnd = Math.ceil(pos.y + size.y);
+    var grid;
+    if (type == "obstacle") {
+        // Check if beyond boundaries
+        if (xStart < 0 || xEnd > this.width || yStart < 0) return "wall";
+        else if (yEnd > this.height) return "lava";
 
-    // Check if beyond boundaries
-    if (xStart < 0 || xEnd > this.width || yStart < 0) {
-        return "wall";
-    } else if (yEnd > this.height) {
-        return "lava";
-    }
+        grid = this.grid;
+    } else if (type == "island") grid = this.islandGrid;
+    else if (type = "trigger") grid = this.triggerGrid;
 
     //  Is there any obstacle overlapping the players bounding box.
     for (var y = yStart; y < yEnd; y++) {
         for (var x = xStart; x < xEnd; x++) {
-            var fieldType = this.grid[y][x];
-            if (fieldType) {
-                return fieldType
-            }
-        }
-    }
-
-}
-
-Level.prototype.islandStructAt = function(pos, size) {
-    var xStart = Math.floor(pos.x);
-    var xEnd = Math.ceil(pos.x + size.x);
-    var yStart = Math.floor(pos.y);
-    var yEnd = Math.ceil(pos.y + size.y);
-
-    //  Is there any island obstacle overlapping the players bounding box.
-    for (var y = yStart; y < yEnd; y++) {
-        for (var x = xStart; x < xEnd; x++) {
-            var fieldType = this.islandGrid[y][x];
+            var fieldType = grid[y][x];
             if (fieldType) {
                 return fieldType
             }
@@ -135,24 +112,6 @@ Level.prototype.actorAt = function(actor) {
             actor.pos.y < other.pos.y + other.size.y
         ) {
             return other;
-        }
-    }
-}
-
-// Collision with the trigger location of any dialog enabled actor.
-Level.prototype.triggerAt = function(pos, size) {
-    var xStart = Math.floor(pos.x);
-    var xEnd = Math.ceil(pos.x + size.x);
-    var yStart = Math.floor(pos.y);
-    var yEnd = Math.ceil(pos.y + size.y);
-
-    //  Is there any obstacle overlapping the players bounding box.
-    for (var y = yStart; y < yEnd; y++) {
-        for (var x = xStart; x < xEnd; x++) {
-            var fieldType = this.triggerGrid[y][x];
-            if (fieldType) {
-                return fieldType
-            }
         }
     }
 }

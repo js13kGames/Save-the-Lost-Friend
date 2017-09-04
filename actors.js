@@ -37,7 +37,7 @@ Player.prototype.moveX = function(step, level, keys) {
 
     var motion = new Vector(this.speed.x * step, 0);
     var newPos = this.pos.plus(motion);
-    var obstacle = level.obstacleAt(newPos, this.size)
+    var obstacle = level.collisionWith(newPos, this.size, "obstacle");
     if (obstacle) {
         level.playerTouched(obstacle);
     } else {
@@ -59,7 +59,7 @@ Player.prototype.moveY = function(step, level, keys) {
     this.speed.y += step * gravity;
     var motion = new Vector(0, this.speed.y * step);
     var newPos = this.pos.plus(motion);
-    var obstacle = level.obstacleAt(newPos, this.size);
+    var obstacle = level.collisionWith(newPos, this.size, "obstacle");
     if (obstacle) {
         level.playerTouched(obstacle);
         if (keys.up && this.speed.y > 0) { // Touched obstacle, Moving down , Up Key pressed -> Move up.
@@ -110,7 +110,7 @@ Player.prototype.act = function(step, level, keys) {
         this.size.y -= step;
     }
 
-    var triggerObject = level.triggerAt(this.pos, this.size);
+    var triggerObject = level.collisionWith(this.pos, this.size, "trigger");
     if (triggerObject) {
         level.levelInfo.playerInteract(triggerObject, level);
     } else {
@@ -190,7 +190,7 @@ PlayerNonPlatformer.prototype.move = function(step, level, keys) {
 
     var motion = new Vector(this.speed.x * step, this.speed.y * step);
     var newPos = this.pos.plus(motion);
-    var obstacle = level.obstacleAt(newPos, this.size)
+    var obstacle = level.collisionWith(newPos, this.size, "obstacle")
     if (obstacle) {
         level.playerTouched(obstacle);
     } else {
@@ -219,7 +219,7 @@ Lava.prototype.type = "lava";
 // Called at every step of the animate.
 Lava.prototype.act = function(step, level) {
     var newPos = this.pos.plus(this.speed.times(step)); // Calculate newPos
-    if (!level.obstacleAt(newPos, this.size)) { // If no obstacle set newPos
+    if (!level.collisionWith(newPos, this.size, "obstacle")) { // If no obstacle set newPos
         this.pos = newPos
     } else if (this.repeatPos) {
         this.pos = this.repeatPos;
