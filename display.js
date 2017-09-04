@@ -42,21 +42,13 @@ CanvasDisplay.prototype.drawFrame = function(step) {
 
 CanvasDisplay.prototype.updateViewport = function() {
     var view = this.viewport,
-        marginX = view.width / 3,
-        marginY = view.height / 3;
-    var player = this.level.player;
+        player = this.level.player;
     var center = player.pos.plus(player.size.times(0.5));
 
-    if (center.x < view.left + marginX)
-        view.left = Math.max(center.x - marginX, 0);
-    else if (center.x > view.left + view.width - marginX)
-        view.left = Math.min(center.x + marginX - view.width,
-            this.level.width - view.width);
-    if (center.y < view.top + marginY)
-        view.top = Math.max(center.y - marginY, 0);
-    else if (center.y > view.top + view.height - marginY)
-        view.top = Math.min(center.y + marginY - view.height,
-            this.level.height - view.height);
+    view.left = center.x - view.width / 2;
+    view.top = center.y - 10;
+    if (view.top < 0) view.top = 0;
+    else if (view.top > view.height) view.top = view.height;
 };
 
 CanvasDisplay.prototype.clearDisplay = function() {
@@ -79,7 +71,8 @@ CanvasDisplay.prototype.drawBackground = function() {
 
     for (var y = yStart; y < yEnd; y++) {
         for (var x = xStart; x < xEnd; x++) {
-            var tile = this.level.grid[y][x];
+            var tile = null;
+            if (this.level.grid[y]) tile = this.level.grid[y][x];
             if (tile == null) continue;
             var screenX = (x - view.left) * Game.scale;
             var screenY = (y - view.top) * Game.scale;
@@ -88,25 +81,9 @@ CanvasDisplay.prototype.drawBackground = function() {
     }
 };
 
-/*
-CanvasDisplay.prototype.drawActors = function() {
-    this.level.actors.forEach(function(actor) {
-        var width = actor.size.x * Game.scale;
-        var height = actor.size.y * Game.scale;
-        var x = (actor.pos.x - this.viewport.left) * Game.scale;
-        var y = (actor.pos.y - this.viewport.top) * Game.scale;
-        if (actor.type != "player")
-            actor.draw(this.cx, x, y);
-    }, this);
-    var x = (this.level.player.pos.x - this.viewport.left) * Game.scale;
-    var y = (this.level.player.pos.y - this.viewport.top) * Game.scale;
-    this.level.player.draw(this.cx, x, y);
-};
-*/
-
 CanvasDisplay.prototype.drawActors = function() {
     this.level.actors.sort(function(actor1, actor2) {
-        return (actor1.pos.y < actor2.pos.y);
+        return ((actor1.pos.y + actor1.size.y) > (actor2.pos.y + actor2.size.y));
     });
 
     this.level.actors.forEach(function(actor) {
@@ -114,7 +91,6 @@ CanvasDisplay.prototype.drawActors = function() {
         var height = actor.size.y * Game.scale;
         var x = (actor.pos.x - this.viewport.left) * Game.scale;
         var y = (actor.pos.y - this.viewport.top) * Game.scale;
-        // if (actor.type != "player")
         actor.draw(this.cx, x, y);
     }, this);
 }
