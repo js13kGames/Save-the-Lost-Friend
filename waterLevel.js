@@ -1,13 +1,9 @@
-var rowWidth = 88;
-var rowHeight = 22;
-var isLandSizePercent = .2;
-var islandFixedSize = ~~(rowWidth * isLandSizePercent);
-var islandVertFixedSize = ~~(rowHeight * isLandSizePercent);
-var horizIslandStartPoint = ~~(rowWidth / 2 - islandFixedSize / 2);
-var vertIslandStartPoint = ~~(rowHeight / 2 - islandVertFixedSize / 2);
+var rowWidth = 400;
+var rowHeight = 400;
+var isLandSizePercent = 20;
 var remSharkPercent = .995; // 1 percent of sharks.
 var remLogPercent = .99; // 5 percent of logs
-var numberOfTilesInIsland = 20;
+var numberOfTilesInIsland = 100;
 
 waterLevelPlan = createPlan(rowWidth, rowHeight, isLandSizePercent, remSharkPercent, remLogPercent, numberOfTilesInIsland);
 

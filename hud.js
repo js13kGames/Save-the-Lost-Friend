@@ -21,6 +21,10 @@ InGameHUD.prototype.setHealthBar = function(context, funcToCall, maxValue) {
     this.healthBar = { "context": context, "funcToCall": funcToCall, maxValue: maxValue };
 };
 
+InGameHUD.prototype.setPlayerProgress = function(context, funcToCall, maxValue) {
+    this.playerProgressBar = { "context": context, "funcToCall": funcToCall, maxValue: maxValue };
+};
+
 InGameHUD.prototype.setGameMessage = function(message, noTimeOut) {
     this.gameMessage = message;
     if (!noTimeOut) {
@@ -102,6 +106,10 @@ InGameHUD.prototype.draw = function() {
     if (this.healthBar) {
         var value = this.healthBar.context[this.healthBar.funcToCall]();
         this.drawBar(Game.width - 130, Game.height + 20, 100, 10, value, this.healthBar.maxValue);
+    }
+    if (this.playerProgressBar) {
+        var value = this.playerProgressBar.context[this.playerProgressBar.funcToCall]();
+        this.drawBar(Game.width / 2 - 100, Game.height + 20, 200, 10, value, this.playerProgressBar.maxValue);
     }
     if (this.gameMessage) {
         this.drawGameMessage(this.gameMessage);

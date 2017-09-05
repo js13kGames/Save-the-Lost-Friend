@@ -139,6 +139,10 @@ Level.prototype.playerTouched = function(type, actor) {
     }
 };
 
+Level.prototype.getPlayerProgress = function() {
+    return ~~(this.player.pos.x);
+}
+
 var updateTriggerRegion = function(actor) {
     var pos = actor.pos;
     var actorId = actor.id;
@@ -237,6 +241,8 @@ function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level); // Clear display for each level.   
     var hud = new InGameHUD(document.body);
     hud.setHealthBar(level.player, "getHealth", 100);
+    if (level.levelInfo.type == LEVEL_TYPE.PLATFORMER)
+        hud.setPlayerProgress(level, "getPlayerProgress", level.width);
     Game.hud = hud;
     runAnimation(function(step) {
         level.animate(step, keys);

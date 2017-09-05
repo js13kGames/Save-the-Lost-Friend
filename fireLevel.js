@@ -1,28 +1,25 @@
-var fireLevelMap = ["                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                                ",
-    "                                                                  xxx           ",
-    "                                                   xx      xx    xx!xx          ",
-    "                                    o o      xx                  x!!!x          ",
-    "                                                                 xx!xx          ",
-    "                                   xxxxx                          xvx           ",
-    "                                                                            xx  ",
-    "  xx                                      o o                                x  ",
-    "  x                     o                                                    x  ",
-    "  x                                      xxxxx                             o x  ",
-    "  x          xxxx       o                                                    x  ",
-    "  x  @       x  x       =                  |                     xxxxx       x  ",
-    "  xxxxxxxxxxxx  xxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxx     xxxxxxx   xxxxxxxxx  ",
-    "                              x   x                  x     x                    ",
-    "                              x!!!x                  x!!!!!x                    ",
-    "                              x!!!x                  x!!!!!x                    ",
-    "                              xxxxx                  xxxxxxx                    ",
-    "                                                                                ",
-    "                                                                                "
-];
+function generateLevel(width, height) {
+    var startX = 0;
+    var startY = ~~(height * 2 / 3);
+    var level = [];
+    for (var y = 0; y < height; y++) {
+        var columns = [];
+        for (var x = 0; x < width; x++) {
+            if (y > startY) {
+                columns.push("x");
+            } else if (x % 10 == 0 && y == startY - 4) {
+                columns.push("o");
+            } else {
+                columns.push(" ");
+            }
+        }
+        level.push(columns);
+    }
+    level[startY - 1][1] = "@";
+    return level;
+}
+
+var testLevel = generateLevel(200, 22);
 
 var fireLevelBackgroundChars = {
     "x": "wall",
@@ -38,19 +35,16 @@ var fireLevelActorChars = {
 };
 
 
-var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
+//var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
+var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, testLevel, fireLevelBackgroundChars, fireLevelActorChars);
 
 fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
-        cx.save();
         cx.fillStyle = "white";
         cx.fillRect(x, y, 20.5, 20);
-        cx.restore();
     } else if (backgroundChar == "lava") {
-        cx.save();
         cx.fillStyle = "red";
         cx.fillRect(x, y, 20, 20);
-        cx.restore();
     }
 };
 

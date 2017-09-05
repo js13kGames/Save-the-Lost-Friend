@@ -15,6 +15,11 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
         plan[y][x] = charSymbol;
     }
 
+    var islandFixedSize = ~~(rowWidth * isLandSizePercent);
+    var islandVertFixedSize = ~~(rowHeight * isLandSizePercent);
+    var horizIslandStartPoint = ~~(rowWidth / 2 - islandFixedSize / 2);
+    var vertIslandStartPoint = ~~(rowHeight / 2 - islandVertFixedSize / 2);
+
     // Top and bottom walls, island , Earth and Water sign posts
     for (var i = 0; i < rowWidth; i++) {
         if (i == ~~(horizIslandStartPoint + islandFixedSize / 2)) {
@@ -46,7 +51,6 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
     }
 
     // Create a randomly shaped island.
-
     var pos = new Vector(0, 0);
     var directionalPos = getDirectionalPos(pos);
 
@@ -97,7 +101,6 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
             //console.log("After surrounding tiles", surroundingTiles);
             surroundingTiles.map(function(onePos) {
                 //console.log("In surrounding tiles." + onePos.x + " " + onePos.y + " " + plan[onePos.y][onePos.x]);
-
                 if (plan[onePos.y][onePos.x] == null) {
                     //console.log("inside plan. " + onePos.x + " " + onePos.y);
                     setChar(onePos.x, onePos.y, "q");
@@ -144,13 +147,10 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
     var bottomLeftStructure = generateStructure(islandXleft, islandYbottom, numberOfTilesInIsland, isLandChar, directionalPos);
     // Thrid structure in region bottom left done.
     //console.log("Third structure Bottom left region done.");
-
     // Top right
     var topRightStructure = generateStructure(islandXright, islandYtop, numberOfTilesInIsland, isLandChar, directionalPos);
     // Fourth structure in region bottom left done.
     //console.log("Fourth structure Top right region done.");
-
-
     var nosOfSharks = 0;
     var nosOfLogs = 0;
     // Set the sharks and logs.
@@ -166,13 +166,10 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
                 nosOfLogs += 1;
                 setChar(j, i, "l");
             }
-
-
         }
     }
 
     //console.log("Shark nos." + nosOfSharks + "Nos of logs" + nosOfLogs);
-
     // Choose one of the 4 structures at random
     // Choose a random point inside the structure and assign to bird.
     // Repeat for other structures and place turtle, eagle and wise crab.

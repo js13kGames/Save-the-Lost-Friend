@@ -42,13 +42,26 @@ CanvasDisplay.prototype.drawFrame = function(step) {
 
 CanvasDisplay.prototype.updateViewport = function() {
     var view = this.viewport,
-        player = this.level.player;
+        marginX = view.width / 3,
+        marginY = view.height / 3;
+    var player = this.level.player;
     var center = player.pos.plus(player.size.times(0.5));
 
-    view.left = center.x - view.width / 2;
-    view.top = center.y - 10;
-    if (view.top < 0) view.top = 0;
-    else if (view.top > view.height) view.top = view.height;
+    if (center.x < view.left + marginX)
+        view.left = Math.max(center.x - marginX, 0);
+    else if (center.x > view.left + view.width - marginX)
+        view.left = Math.min(center.x + marginX - view.width,
+            this.level.width - view.width);
+    if (center.y < view.top + marginY)
+        view.top = Math.max(center.y - marginY, 0);
+    else if (center.y > view.top + view.height - marginY)
+        view.top = Math.min(center.y + marginY - view.height,
+            this.level.height - view.height);
+
+    this.xStart = Math.floor(view.left);
+    this.xEnd = Math.ceil(view.left + view.width);
+    this.yStart = Math.floor(view.top);
+    this.yEnd = Math.ceil(view.top + view.height);
 };
 
 CanvasDisplay.prototype.clearDisplay = function() {
@@ -64,13 +77,8 @@ CanvasDisplay.prototype.clearDisplay = function() {
 
 CanvasDisplay.prototype.drawBackground = function() {
     var view = this.viewport;
-    var xStart = Math.floor(view.left);
-    var xEnd = Math.ceil(view.left + view.width);
-    var yStart = Math.floor(view.top);
-    var yEnd = Math.ceil(view.top + view.height);
-
-    for (var y = yStart; y < yEnd; y++) {
-        for (var x = xStart; x < xEnd; x++) {
+    for (var y = this.yStart; y < this.yEnd; y++) {
+        for (var x = this.xStart; x < this.xEnd; x++) {
             var tile = null;
             if (this.level.grid[y]) tile = this.level.grid[y][x];
             if (tile == null) continue;
@@ -87,10 +95,11 @@ CanvasDisplay.prototype.drawActors = function() {
     });
 
     this.level.actors.forEach(function(actor) {
-        var width = actor.size.x * Game.scale;
-        var height = actor.size.y * Game.scale;
-        var x = (actor.pos.x - this.viewport.left) * Game.scale;
-        var y = (actor.pos.y - this.viewport.top) * Game.scale;
-        actor.draw(this.cx, x, y);
+        if (actor.pos.x > this.xStart && actor.pos.x < this.xEnd &&
+            actor.pos.y > this.yStart && actor.pos.y < this.yEnd) {
+            var x = (actor.pos.x - this.viewport.left) * Game.scale;
+            var y = (actor.pos.y - this.viewport.top) * Game.scale;
+            actor.draw(this.cx, x, y);
+        }
     }, this);
 }
