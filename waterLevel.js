@@ -1,6 +1,6 @@
-var rowWidth = 400;
-var rowHeight = 400;
-var isLandSizePercent = 20;
+var rowWidth = 100;
+var rowHeight = 100;
+var isLandSizePercent = 0.2;
 var remSharkPercent = .995; // 1 percent of sharks.
 var remLogPercent = .99; // 5 percent of logs
 var numberOfTilesInIsland = 100;
@@ -232,7 +232,7 @@ var dialogEnabledSequence = ["bird", "crab", "eagle", "owl"];
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars, dialogEnabledSequence);
 
 waterLevel.playerTouched = function(type, actor, level) {
-    if ((type == "shark") && (level.status == null)) {
+    if ((type == "shark") && (level.status == null) && (!Game.inInteraction)) {
         if (level.player.playerHitTimer == 0) {
             level.player.health -= 10;
             level.player.playerHitTimer = level.player.playerHitTimerMax;

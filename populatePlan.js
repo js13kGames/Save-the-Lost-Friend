@@ -63,12 +63,8 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
         return (pos.plus(dir));
     }
 
-    var getRandomElement = function(inVec) {
-        return inVec[Math.floor(Math.random() * inVec.length)];
-    }
-
     var checkInBoundary = function(retVec) {
-        if (retVec.x < 1 || retVec.x > Game.width - 2 || retVec.y < 1 || retVec.y > Game.height - 2) {
+        if (retVec.x < 1 || retVec.x > rowWidth - 2 || retVec.y < 1 || retVec.y > rowHeight - 2) {
             return false;
         } else
             return true;
@@ -94,9 +90,16 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
         var change = false;
         var surroundingTiles = [];
         var structureTiles = [];
-        var inPos = new Vector(islandX, islandY);
         var tobeExploredTiles = [];
-        while (i < numberOfTilesInIsland - 1) {
+        var inPos = new Vector(islandX, islandY);
+        // Check & set the middle posn.
+        if (plan[inPos.y][inPos.x] == null) {
+            setChar(inPos.x, inPos.y, "q");
+            structureTiles.push(inPos);
+            i = 1;
+        }
+
+        while (i < nosOfTiles) {
             surroundingTiles = getSurroundingTiles(inPos, directionalPos);
             //console.log("After surrounding tiles", surroundingTiles);
             surroundingTiles.map(function(onePos) {
@@ -136,6 +139,12 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
     var islandYbottom = Math.floor(3 * rowHeight / 4);
     var islandXleft = ~~(rowWidth / 4);
     var islandYtop = ~~(rowHeight / 4);
+    var islandXCenter = Math.floor(rowWidth / 2);
+    var islandYCenter = Math.floor(rowHeight / 2);
+
+    var centralStructure = generateStructure(islandXCenter, islandYCenter, numberOfTilesInIsland, isLandChar, directionalPos);
+    console.log("Central island done.", centralStructure, centralStructure.length);
+
 
     var bottomRightStructure = generateStructure(islandXright, islandYbottom, numberOfTilesInIsland, isLandChar, directionalPos);
     //console.log("First structure Bottom right region done.");

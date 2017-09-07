@@ -238,7 +238,7 @@ var resetKeyPressed = function() {
 // Called from runGame.
 // Calls runAnimation function with an anonymous func as parameter
 function runLevel(level, Display, andThen) {
-    var display = new Display(document.body, level); // Clear display for each level.   
+    var display = new Display(document.body, level); // Clear display for each level.       
     var hud = new InGameHUD(document.body);
     hud.setHealthBar(level.player, "getHealth", 100);
     if (level.levelInfo.type == LEVEL_TYPE.PLATFORMER)
@@ -266,6 +266,7 @@ function runLevel(level, Display, andThen) {
 
 function runGame(startingLevel, Display) {
     function startLevel(levelinfo) {
+        Game.inInteraction = false;
         runLevel(new Level(levelinfo), Display, function(status) {
             if (status == "lost")
                 startLevel(levelinfo);

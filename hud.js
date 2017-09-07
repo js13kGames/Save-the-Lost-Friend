@@ -13,7 +13,7 @@ function InGameHUD(parent) {
     this.maxGameMessageSize = 0;
     this.width = this.canvas.width;
     this.height = this.canvas.height;
-    this.cx.fillStyle = "#eeeeaa";
+    this.cx.fillStyle = "rgb(238, 238, 170)";
     this.questionIndex = 0;
 }
 
@@ -38,9 +38,9 @@ InGameHUD.prototype.setGameMessage = function(message, noTimeOut) {
 InGameHUD.prototype.drawBar = function(x, y, width, height, value, max) {
     this.cx.save();
     var greenValue = ~~((value / max) * width); // Draw the red scroll bar.
-    this.cx.fillStyle = "#ff0000ff";
+    this.cx.fillStyle = "red";
     this.cx.fillRect(x + greenValue, y, width - greenValue, height);
-    this.cx.fillStyle = "#00ff00ff";
+    this.cx.fillStyle = "green";
     this.cx.fillRect(x, y, greenValue, height); // Draw the green scroll bar.
     this.cx.restore();
 }
@@ -62,9 +62,9 @@ InGameHUD.prototype.drawGameMessage = function(message, lineNum, highLight) {
         width = 2 * textOffsetX + textWidth,
         height = 2 * textOffsetY + textHeight;
     var textX = Game.width / 2 - actualTextWidth / 2;
-    this.cx.fillStyle = "#ffffff22";
+    this.cx.fillStyle = "rgba(255, 255, 255, 34)";
     this.cx.fillRect(x, y, width, height);
-    this.cx.fillStyle = "#aaaaaaff";
+    this.cx.fillStyle = "rgba(170, 170, 170, 255)";
     this.cx.fillRect(x + offset, y + offset, width - 2 * offset, height - 2 * offset); // Draw the green scroll bar.    
     if (highLight) {
         this.cx.fillStyle = "fuchsia";

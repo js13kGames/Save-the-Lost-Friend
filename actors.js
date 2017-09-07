@@ -133,16 +133,16 @@ Player.prototype.act = function(step, level, keys) {
 Player.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = "gold";
-    cx.fillRect(x, y, 15, 30);
+    cx.fillRect(x, y, Game.scale * 3 / 4, Game.scale * 3 / 2);
     cx.fillStyle = "black";
     if (this.facingRight) {
-        cx.fillRect(x + 10, y + 4, 3, 3);
+        cx.fillRect(x + Game.scale * 1 / 2, y + Game.scale * 1 / 5, Game.scale * 1 / 7, Game.scale * 1 / 7);
         cx.fillStyle = "black";
-        cx.fillRect(x + 7, y + 12, 7, 2);
+        cx.fillRect(x + Game.scale * 1 / 3, y + Game.scale * 1 / 2, Game.scale * 1 / 3, Game.scale * 1 / 10);
     } else {
-        cx.fillRect(x, y + 4, 3, 3);
+        cx.fillRect(x, y + Game.scale * 1 / 5, Game.scale * 1 / 7, Game.scale * 1 / 7);
         cx.fillStyle = "black";
-        cx.fillRect(x, y + 12, 7, 2);
+        cx.fillRect(x, y + Game.scale * 1 / 2, Game.scale * 1 / 3, Game.scale * 1 / 10);
     }
     cx.restore();
 }
@@ -231,7 +231,7 @@ Lava.prototype.act = function(step, level) {
 Lava.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = "red";
-    cx.fillRect(x, y, 20.5, 20);
+    cx.fillRect(x, y, Game.scale, Game.scale);
     cx.restore();
 }
 
