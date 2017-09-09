@@ -101,4 +101,5 @@ var drawTree = function(cx, x, y) {
     cx.fillRect(rectStartX - (radius * horizBranchNos - trunkWidth / 2), rectStartY - (radius * 2 * vertBranchNos - radius), radius * 2 * horizBranchNos, radius * 2 * vertBranchNos);
     cx.fillStyle = "brown";
     cx.fillRect(rectStartX, rectStartY, trunkWidth, trunkHeight);
+    cx.strokeRect(rectStartX - 1, rectStartY, trunkWidth + 2, trunkHeight);
 }

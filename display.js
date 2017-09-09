@@ -93,13 +93,22 @@ CanvasDisplay.prototype.drawActors = function() {
     this.level.actors.sort(function(actor1, actor2) {
         return ((actor1.pos.y + actor1.size.y) > (actor2.pos.y + actor2.size.y));
     });
+    var drawLastList = [];
 
     this.level.actors.forEach(function(actor) {
+        if (actor.drawLast) {
+            drawLastList.push(actor);
+        }
         if (actor.pos.x > this.xStart && actor.pos.x < this.xEnd &&
             actor.pos.y > this.yStart && actor.pos.y < this.yEnd) {
             var x = (actor.pos.x - this.viewport.left) * Game.scale;
             var y = (actor.pos.y - this.viewport.top) * Game.scale;
             actor.draw(this.cx, x, y);
         }
+    }, this);
+    drawLastList.forEach(function(actor) {
+        var x = (actor.pos.x - this.viewport.left) * Game.scale;
+        var y = (actor.pos.y - this.viewport.top) * Game.scale;
+        actor.draw(this.cx, x, y);
     }, this);
 }

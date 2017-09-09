@@ -143,19 +143,25 @@ FireBird.prototype.draw = function(cx, x, y) {
 
 function Tree(pos, character) {
     this.pos = pos;
-    this.pos.y -= 5;
-    this.size = new Vector(1, 1);
+    this.size = new Vector(3, 10);
+    this.addFruits = false;
 }
 
 Tree.prototype.type = "tree";
 
 Tree.prototype.act = function(step, level) {
-
+    if (!this.addFruits) {
+        var coin = new Coin(new Vector(this.pos.x, this.pos.y - 8));
+        coin.drawLast = true;
+        level.actors.push(coin);
+        this.addFruits = true;
+    }
 };
 
 Tree.prototype.draw = function(cx, x, y) {
     cx.save();
-    drawTree(cx, x, y + 120);
+    //console.log(this.pos.x * Game.scale + " " + this.pos.y * Game.scale + " " + x + " " + y);   
+    drawTree(cx, x, y + (2 * Game.scale));
     cx.restore();
 }
 
@@ -165,6 +171,7 @@ function VolcanoLava(pos, character) {
     this.size = new Vector(1, 1);
     this.getSpeed();
     this.gravity = 0.005;
+    this.gravity = 30;
 }
 
 VolcanoLava.prototype.getSpeed = function() {
@@ -176,7 +183,7 @@ VolcanoLava.prototype.getSpeed = function() {
 VolcanoLava.prototype.type = "volcanoLava";
 
 VolcanoLava.prototype.act = function(step, level) {
-    this.speed.y += step * gravity;
+    this.speed.y += step * this.gravity;
     var motion = new Vector(this.speed.x * step, this.speed.y * step);
     var newPos = this.pos.plus(motion);
     var actor = this;
@@ -197,6 +204,14 @@ VolcanoLava.prototype.draw = function(cx, x, y) {
     cx.restore();
 }
 
+function FirePlayer(pos) {
+    PlayerPlatformer.call(this, pos);
+    this.drawLast = true;
+    this.health = 100;
+    this.flyPower = 0;
+}
+FirePlayer.prototype = Object.create(PlayerPlatformer.prototype);
+
 var fireLevelBackgroundChars = {
     "x": "wall",
     "!": "lava",
@@ -204,7 +219,7 @@ var fireLevelBackgroundChars = {
 };
 
 var fireLevelActorChars = {
-    "@": PlayerPlatformer,
+    "@": FirePlayer,
     "v": VolcanoLava,
     "f": FireBird,
     "b": FireBolt,
@@ -214,7 +229,9 @@ var fireLevelActorChars = {
 
 //var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
 var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, testLevel, fireLevelBackgroundChars, fireLevelActorChars);
-var initMountainDone = false;
+fireLevel.display = CanvasDisplay;
+fireLevel.platformerType = "horizontal";
+
 fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
         cx.fillStyle = "rgba(170, 170, 50, 255)";
@@ -241,20 +258,18 @@ fireLevel.playerTouched = function(type, actor, level) {
         Game.hud.setGameMessage("Lava killed you.");
         return "lost";
     } else if (type == "fireBolt") {
-        reducePlayerHealth(25, level, "Beware of the Fire Bolt.");
+        reducePlayerHealth(50, level, "Beware of the Fire Bolt.");
     } else if (type == "volcanoLava") {
-        reducePlayerHealth(25, level, "Beware of the Volcanic Lava.");
+        reducePlayerHealth(50, level, "Beware of the Volcanic Lava.");
     } else if (type == "coin") { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
-        // Check if any coins left.  If no coins left then win condition met
-        if (!level.actors.some(function(actor) {
-                return actor.type == "coin";
-            })) {
-            Game.hud.setGameMessage("You Won!");
-            return "won";
-        }
+        reducePlayerHealth(-25, level, "You ate some fruits.");
+    } else if (type == "tree") {
+        level.player.gravity = 20;
+    } else {
+        level.player.gravity = level.player.gravityConst;
     }
 
     if (level.player.health <= 0 && level.status == null) {

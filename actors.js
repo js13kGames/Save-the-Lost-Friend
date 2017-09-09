@@ -8,8 +8,6 @@ function Player(pos) {
     this.playerHitTimerMax = 100;
     this.skipDialogTimer = 0;
     this.skipDialogTimerMax = 200;
-
-
 }
 Player.prototype.type = "player";
 
@@ -46,9 +44,6 @@ Player.prototype.moveX = function(step, level, keys) {
 
 };
 
-var gravity = 30;
-var jumpSpeed = 17;
-
 // Note movex and moveY only test for the background layer.
 // Calculate new posn based on force of gravity / Natural force.
 // speed, motion and newPos.
@@ -56,16 +51,16 @@ var jumpSpeed = 17;
 // If yes & keys.up & speed  > 0 & then set speed to -jumpSpeed ( reverse direction.)
 Player.prototype.moveY = function(step, level, keys) {
     // Calculate new posn based on force of gravity / Natural force.
-    this.speed.y += step * gravity;
+    this.speed.y += step * this.gravity;
     var motion = new Vector(0, this.speed.y * step);
     var newPos = this.pos.plus(motion);
     var obstacle = level.collisionWith(newPos, this.size, "obstacle");
     if (obstacle) {
         level.playerTouched(obstacle);
         if (keys.up && this.speed.y > 0) { // Touched obstacle, Moving down , Up Key pressed -> Move up.
-            this.speed.y = -jumpSpeed;
+            this.speed.y = -this.jumpSpeed;
             this.onKeyUpEnableDoubleJump = true; // Set up for double jump.
-            this.flyPower = FLY_POWER_MAX; // Recharge the fly power to full.            
+            this.flyPower = this.flyPower; // Recharge the fly power to full.            
         } else // Touched obstacle and no Up key so stop moving
             this.speed.y = 0;
     } else { // no obstacle                    
@@ -77,7 +72,7 @@ Player.prototype.moveY = function(step, level, keys) {
             }
         }
         if (keys.up && this.enableDoubleJump == true && this.speed.y > -2) {
-            this.speed.y = -jumpSpeed;
+            this.speed.y = -this.jumpSpeed;
             this.enableDoubleJump = false;
             this.flyPower -= 1;
 
@@ -154,6 +149,9 @@ function PlayerPlatformer(pos) {
     this.enableDoubleJump = false;
     this.fly = false;
     this.flyPower = FLY_POWER_MAX;
+    this.gravity = 30;
+    this.gravityConst = 30;
+    this.jumpSpeed = 17;
 }
 
 PlayerPlatformer.prototype = Object.create(Player.prototype);
@@ -190,13 +188,17 @@ PlayerNonPlatformer.prototype.move = function(step, level, keys) {
 
     var motion = new Vector(this.speed.x * step, this.speed.y * step);
     var newPos = this.pos.plus(motion);
+    this.checkCollision(newPos, level);
+}
+
+PlayerNonPlatformer.prototype.checkCollision = function(newPos, level) {
     var obstacle = level.collisionWith(newPos, this.size, "obstacle")
     if (obstacle) {
         level.playerTouched(obstacle);
     } else {
         this.pos = newPos;
     }
-};
+}
 
 PlayerNonPlatformer.prototype.act = Player.prototype.act;
 

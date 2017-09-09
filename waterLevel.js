@@ -230,6 +230,7 @@ var waterLevelActorChars = {
 var dialogEnabledSequence = ["bird", "crab", "eagle", "owl"];
 
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars, dialogEnabledSequence);
+waterLevel.display = CanvasDisplay;
 
 waterLevel.playerTouched = function(type, actor, level) {
     if ((type == "shark") && (level.status == null) && (!Game.inInteraction)) {

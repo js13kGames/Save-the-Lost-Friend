@@ -140,7 +140,10 @@ Level.prototype.playerTouched = function(type, actor) {
 };
 
 Level.prototype.getPlayerProgress = function() {
-    return ~~(this.player.pos.x);
+    if (this.levelInfo.platformerType == "horizontal")
+        return ~~(this.player.pos.x);
+    else if (this.levelInfo.platformerType == "vertical")
+        return ~~(this.height - this.player.pos.y);
 }
 
 var updateTriggerRegion = function(actor) {
@@ -241,8 +244,12 @@ function runLevel(level, Display, andThen) {
     var display = new Display(document.body, level); // Clear display for each level.       
     var hud = new InGameHUD(document.body);
     hud.setHealthBar(level.player, "getHealth", 100);
-    if (level.levelInfo.type == LEVEL_TYPE.PLATFORMER)
-        hud.setPlayerProgress(level, "getPlayerProgress", level.width);
+    if (level.levelInfo.type == LEVEL_TYPE.PLATFORMER) {
+        if (level.levelInfo.platformerType == "horizontal")
+            hud.setPlayerProgress(level, "getPlayerProgress", level.width);
+        else if (level.levelInfo.platformerType == "vertical")
+            hud.setPlayerProgress(level, "getPlayerProgress", level.height);
+    }
     Game.hud = hud;
     runAnimation(function(step) {
         level.animate(step, keys);
@@ -264,10 +271,10 @@ function runLevel(level, Display, andThen) {
 // Recursive
 // if lost re-call same level else recursively call next level till final level
 
-function runGame(startingLevel, Display) {
+function runGame(startingLevel) {
     function startLevel(levelinfo) {
         Game.inInteraction = false;
-        runLevel(new Level(levelinfo), Display, function(status) {
+        runLevel(new Level(levelinfo), startingLevel.display, function(status) {
             if (status == "lost")
                 startLevel(levelinfo);
             else if (levelinfo.nextLevel)
