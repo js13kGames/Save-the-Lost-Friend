@@ -1,4 +1,4 @@
-function generateBasicLevel(width, height, xMargin) {
+function generateRiverBasicLevel(width, height, xMargin) {
     var startX = xMargin;
     var endX = width - 2 * xMargin;
 
@@ -20,7 +20,7 @@ function generateBasicLevel(width, height, xMargin) {
     return level;
 }
 
-function generateLevelWithObstacles(level) {
+function generateRiverLevelWithObstacles(level) {
     var width = level[0].length;
     var height = level.length;
     var xMargin = 1;
@@ -57,7 +57,7 @@ function generateLevelWithObstacles(level) {
 
 
 var xMargin = 1;
-var testLevel = generateLevelWithObstacles(generateBasicLevel(50, 60, xMargin));
+var riverLevelMap = generateRiverLevelWithObstacles(generateRiverBasicLevel(50, 60, xMargin));
 
 function RiverPlayer(pos) {
     PlayerNonPlatformer.call(this, pos);
@@ -243,8 +243,7 @@ ModCanvasDisplay.prototype.drawActors = function() {
     this.level.player.draw(this.cx, x, y);
 }
 
-//var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, riverLevelMap, riverLevelBackgroundChars, riverLevelActorChars);
-var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, testLevel, riverLevelBackgroundChars, riverLevelActorChars);
+var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, riverLevelMap, riverLevelBackgroundChars, riverLevelActorChars);
 riverLevel.display = ModCanvasDisplay;
 riverLevel.platformerType = "vertical";
 

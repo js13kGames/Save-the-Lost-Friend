@@ -1,4 +1,4 @@
-function generateBasicLevel(width, height) {
+function generateFireBasicLevel(width, height) {
     var startX = 0;
     var startY = ~~(height * 2 / 3);
     var level = [];
@@ -22,7 +22,7 @@ var fireLevelConstants = {
     "fireBirdMinHeight": 5
 }
 
-function generateLevelWithObstacles(level) {
+function generateFireLevelWithObstacles(level) {
     var width = level[0].length;
     var height = level.length;
     var startX = 0;
@@ -66,7 +66,7 @@ function generateLevelWithObstacles(level) {
             isFlat = false;
         } else if (enemySelect == "TREE" && isFlat == true) {
             var treeSize = 5;
-            level[startY][startX + ~~(treeSize / 2)] = "t";
+            level[startY][startX + 2] = "t";
             startX = startX + treeSize;
             isFlat = false;
         } else if (isFlat == false) {
@@ -77,7 +77,7 @@ function generateLevelWithObstacles(level) {
     return level;
 }
 
-var testLevel = generateLevelWithObstacles(generateBasicLevel(200, 50));
+var fireLevelMap = generateFireLevelWithObstacles(generateFireBasicLevel(200, 50));
 
 function FireBolt(pos, character) {
     this.pos = pos;
@@ -226,9 +226,7 @@ var fireLevelActorChars = {
     "t": Tree
 };
 
-
-//var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
-var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, testLevel, fireLevelBackgroundChars, fireLevelActorChars);
+var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
 fireLevel.display = CanvasDisplay;
 fireLevel.platformerType = "horizontal";
 
