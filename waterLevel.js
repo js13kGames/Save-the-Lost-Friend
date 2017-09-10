@@ -244,11 +244,20 @@ waterLevel.playerTouched = function(type, actor, level) {
             return "lost"
         }
     }
-    if (actor && actor.dialog) {
-        //actor.dialog.speak();
-    }
-    if (type == "earth" && level.status == null) {
-        return "won";
+    if (level.status == null) {
+        if (type == "earth") {
+            Game.nextLevel = null;
+            return "won";
+        } else if (type == "fire") {
+            Game.nextLevel = fireLevel;
+            return "won";
+        } else if (type == "water") {
+            Game.nextLevel = riverLevel;
+            return "won";
+        } else if (type == "air") {
+            Game.nextLevel = airLevel;
+            return "won";
+        }
     }
 };
 

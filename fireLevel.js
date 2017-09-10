@@ -276,6 +276,7 @@ fireLevel.playerTouched = function(type, actor, level) {
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
+        Game.level = waterLevel;
         Game.hud.setGameMessage(actor.winMessage);
         return "won";
     } else if (type == "tree") {

@@ -270,12 +270,13 @@ function Gem(pos, type, color1, color2, winMessage) {
     this.color1 = color1;
     this.color2 = color2;
     this.winMessage = "You have succeeded in getting the " + winMessage;
+    this.drawLast = true;
 };
 
 Gem.prototype.act = function(step, level) {}
 
 Gem.prototype.draw = function(cx, x, y) {
     cx.save();
-    drawDiamond(cx, x, y, this.color1, this.color2);
+    drawDiamond(cx, x, y + 2.5 * Game.scale, this.color1, this.color2);
     cx.restore();
 }

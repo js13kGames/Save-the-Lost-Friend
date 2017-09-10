@@ -187,9 +187,11 @@ airLevel.playerTouched = function(type, actor, level) {
         Game.hud.setGameMessage("You crashed into the abyss.");
         return "lost";
     } else if (type == "AirGem") { //Filter the coin from actor list as it is picked
+        level.player.gravity = 0;
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
+        Game.level = waterLevel;
         Game.hud.setGameMessage(actor.winMessage);
         return "won";
     } else if (type == "EvilCloud") {

@@ -5,7 +5,8 @@ var Game = {
     width: 1000,
     height: 420,
     currentLevel: null,
-    inInteraction: false
+    inInteraction: false,
+    nextLevel: null
 };
 
 var Vector = function(x, y) {

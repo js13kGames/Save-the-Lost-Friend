@@ -30,7 +30,7 @@ function generateRiverLevelWithObstacles(level) {
     var startX;
     var firstTime = true;
 
-    while (startY > 1) { // Add standing pfs at regular intervals
+    while (startY > 5) { // Add standing pfs at regular intervals
         // Place platform
         startX = ~~(xMargin + Math.random() * (endX - xMargin - 10));
         level[startY][startX] = "n";
@@ -47,11 +47,14 @@ function generateRiverLevelWithObstacles(level) {
         level[startY][startX] = "|";
         startY = startY - 2;
     }
-    // Place a moving log at first posn/
-    startX = ~~(xMargin + Math.random() * (endX - xMargin - 10));
-    level[1][startX] = "|";
+
+    level[0][~~(width / 2) - 1] = "n";
+    level[1][~~(width / 2) - 1] = "n";
+    level[2][~~(width / 2) - 1] = "n";
+    level[3][~~(width / 2) - 1] = "n";
+
     // Set the winning goal character.
-    level[0][~~(width / 2)] = "#";
+    level[1][~~(width / 2)] = "g";
     return level;
 }
 
@@ -61,7 +64,8 @@ var riverLevelMap = generateRiverLevelWithObstacles(generateRiverBasicLevel(50, 
 
 function RiverPlayer(pos) {
     PlayerNonPlatformer.call(this, pos);
-    this.health = 50;
+    this.health = 100;
+    this.drawLast = true;
 }
 
 RiverPlayer.prototype = Object.create(PlayerNonPlatformer.prototype);
@@ -125,8 +129,8 @@ RiverPlayer.prototype.act = function(step, level, keys) {
         }
         this.pos = this.newPos;
         this.inCollision = true;
-        if (collidedObject.type == "WinningGoal") {
-            level.playerTouched("WinningGoal", null);
+        if (collidedObject.type == "RiverGem") {
+            level.playerTouched("RiverGem", collidedObject);
         }
     } else {
         this.inCollision = false;
@@ -151,19 +155,8 @@ RiverPlayer.prototype.act = function(step, level, keys) {
     }
 };
 
-var riverLevelBackgroundChars = {
-    "x": "wall"
-};
-
-var riverLevelActorChars = {
-    "@": RiverPlayer,
-    "n": StandingPlatform,
-    "|": MovingLog,
-    "g": RiverGem
-};
-
 function RiverGem(pos) {
-    Gem.call(this, pos, "FireStoneGem", "#FE7777", "#FE2222", "river gem.");
+    Gem.call(this, pos, "RiverGem", "#7777FE", "#2222FE", "river gem.");
 }
 
 RiverGem.prototype = Object.create(Gem.prototype);
@@ -182,9 +175,7 @@ RiverObject.prototype.draw = function(cx, x, y) {
     cx.restore();
 }
 
-RiverObject.prototype.act = function(step, level) {
-
-}
+RiverObject.prototype.act = function(step, level) {}
 
 function MovingLog(pos) {
     var xSize = ~~(2 + Math.random() * 5); // Size between 2 to 7.
@@ -218,28 +209,19 @@ function StandingPlatform(pos) {
 
 StandingPlatform.prototype = Object.create(RiverObject.prototype);
 
-function ModCanvasDisplay(parent, level) {
-    console.log("Mod canvas called");
-    CanvasDisplay.call(this, parent, level);
-}
-ModCanvasDisplay.prototype = Object.create(CanvasDisplay.prototype);
+var riverLevelBackgroundChars = {
+    "x": "wall"
+};
 
-ModCanvasDisplay.prototype.drawActors = function() {
-    this.level.actors.forEach(function(actor) {
-        var width = actor.size.x * Game.scale;
-        var height = actor.size.y * Game.scale;
-        var x = (actor.pos.x - this.viewport.left) * Game.scale;
-        var y = (actor.pos.y - this.viewport.top) * Game.scale;
-        if (actor.type != "player")
-            actor.draw(this.cx, x, y);
-    }, this);
-    var x = (this.level.player.pos.x - this.viewport.left) * Game.scale;
-    var y = (this.level.player.pos.y - this.viewport.top) * Game.scale;
-    this.level.player.draw(this.cx, x, y);
-}
+var riverLevelActorChars = {
+    "@": RiverPlayer,
+    "n": StandingPlatform,
+    "|": MovingLog,
+    "g": RiverGem
+};
 
 var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, riverLevelMap, riverLevelBackgroundChars, riverLevelActorChars);
-riverLevel.display = ModCanvasDisplay;
+riverLevel.display = CanvasDisplay;
 riverLevel.platformerType = "vertical";
 
 riverLevel.drawBackground = function(backgroundChar, cx, x, y) {
@@ -255,11 +237,12 @@ riverLevel.drawBackground = function(backgroundChar, cx, x, y) {
 riverLevel.playerTouched = function(type, actor, level) {
     if (type == "fierce river" && level.status == null) {
         Game.hud.setGameMessage("Drowned in the fierce river.");
-        return "lost";
+        //return "lost";
     } else if (type == "RiverGem") { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
+        Game.level = waterLevel;
         Game.hud.setGameMessage(actor.winMessage);
         return "won";
     }

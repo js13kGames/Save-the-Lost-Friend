@@ -274,11 +274,12 @@ function runLevel(level, Display, andThen) {
 function runGame(startingLevel) {
     function startLevel(levelinfo) {
         Game.inInteraction = false;
+        Game.nextLevel = null;
         runLevel(new Level(levelinfo), startingLevel.display, function(status) {
             if (status == "lost")
                 startLevel(levelinfo);
-            else if (levelinfo.nextLevel)
-                startLevel(levelinfo.nextLevel);
+            else if (Game.nextLevel)
+                startLevel(Game.nextLevel);
             else {
                 console.log("You win!");
                 startLevel(startingLevel);
