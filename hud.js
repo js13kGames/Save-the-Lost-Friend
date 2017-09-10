@@ -62,9 +62,9 @@ InGameHUD.prototype.drawGameMessage = function(message, lineNum, highLight) {
         width = 2 * textOffsetX + textWidth,
         height = 2 * textOffsetY + textHeight;
     var textX = Game.width / 2 - actualTextWidth / 2;
-    this.cx.fillStyle = "rgba(255, 255, 255, 34)";
+    this.cx.fillStyle = "rgba(255, 255, 255, 0.5)";
     this.cx.fillRect(x, y, width, height);
-    this.cx.fillStyle = "rgba(170, 170, 170, 255)";
+    this.cx.fillStyle = "rgba(170, 170, 170, 0.9)";
     this.cx.fillRect(x + offset, y + offset, width - 2 * offset, height - 2 * offset); // Draw the green scroll bar.    
     if (highLight) {
         this.cx.fillStyle = "fuchsia";

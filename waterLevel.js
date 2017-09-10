@@ -60,19 +60,20 @@ AirSignBoard.prototype = Object.create(SignBoard.prototype);
 
 function NPC(pos, character, type, color, dialogMsg, isActivated) {
     this.pos = pos;
-    this.size = new Vector(1, 1);
+    this.pos.y -= 1;
+    this.size = new Vector(2, 2);
     this.color = color;
     this.hasDialog = true;
     this.dialog = new Dialog();
     this.dialog.messages = dialogMsg;
     this.type = type;
     this.isActivated = isActivated;
+    this.drawLast = true;
 }
 
 NPC.prototype.draw = function(cx, x, y) {
     cx.save();
-    cx.fillStyle = this.color;
-    cx.fillRect(x, y, Game.scale, Game.scale);
+    drawEagle(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
     cx.restore();
 }
 

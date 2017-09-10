@@ -35,7 +35,7 @@ function generateFireLevelWithObstacles(level) {
     var isFlat = true;
     startX = startX + initialOffset;
     var actorList = { "0": "FIREBIRD", "1": "VOLCANO", "2": "TREE" };
-    while (startX < width) {
+    while (startX < width - 10) {
         var enemySelect = actorList[String(~~(Math.random() * Object.keys(actorList).length))];
         var droppingEnemyHolderSize = 5;
         if (enemySelect == "FIREBIRD" && isFlat == true) {
@@ -74,6 +74,7 @@ function generateFireLevelWithObstacles(level) {
             isFlat = true;
         }
     }
+    level[startY - 2][width - 3] = "g";
     return level;
 }
 
@@ -143,7 +144,10 @@ FireBird.prototype.draw = function(cx, x, y) {
 
 function Tree(pos, character) {
     this.pos = pos;
-    this.size = new Vector(3, 10);
+    this.size = new Vector(3, 12);
+    this.horizBranchNos = 3 + getRandomElement([2, 4])
+    this.vertBranchNos = 4 + ~~(Math.random() * 4);
+    this.treeColor = "green";
     this.addFruits = false;
 }
 
@@ -151,9 +155,14 @@ Tree.prototype.type = "tree";
 
 Tree.prototype.act = function(step, level) {
     if (!this.addFruits) {
-        var coin = new Coin(new Vector(this.pos.x, this.pos.y - 8));
-        coin.drawLast = true;
-        level.actors.push(coin);
+        var numberOfBerries = 2 + ~~(Math.random() * 4);
+        for (var i = 0; i < numberOfBerries; i++) {
+            var xOffset = getRandomElement([-(this.horizBranchNos - 1), -1, 0, 1, 2, this.horizBranchNos + 1]);
+            var yOffset = -1 * (7 + ~~(Math.random() * this.vertBranchNos));
+            var coin = new Coin(new Vector(this.pos.x + xOffset, this.pos.y + yOffset));
+            coin.drawLast = true;
+            level.actors.push(coin);
+        }
         this.addFruits = true;
     }
 };
@@ -161,7 +170,7 @@ Tree.prototype.act = function(step, level) {
 Tree.prototype.draw = function(cx, x, y) {
     cx.save();
     //console.log(this.pos.x * Game.scale + " " + this.pos.y * Game.scale + " " + x + " " + y);   
-    drawTree(cx, x, y + (2 * Game.scale));
+    drawTree(cx, x, y + (1 * Game.scale), this.horizBranchNos, this.vertBranchNos, this.treeColor);
     cx.restore();
 }
 
@@ -212,6 +221,26 @@ function FirePlayer(pos) {
 }
 FirePlayer.prototype = Object.create(PlayerPlatformer.prototype);
 
+function FireStoneGem(pos) {
+    this.pos = pos;
+    this.type = "fireStoneGem";
+    this.size = new Vector(2, 2);
+}
+
+FireStoneGem.prototype.act = function(step, level) {}
+
+FireStoneGem.prototype.draw = function(cx, x, y) {
+    cx.save();
+    cx.fillStyle = "red";
+    drawArc(cx, x, y, 2 * Game.scale, 0, 2 * Math.PI, true);
+    cx.fillStyle = "orange";
+    drawArc(cx, x, y, 1.7 * Game.scale, 0, 2 * Math.PI, true);
+    cx.strokeStyle = "yellow";
+    cx.moveTo(x, y);
+    cx.lineTo(x + 1.7 * Game.scale * Math.cos(Math.PI / 4), 1.7 * Game.scale * Math.sin(Math.PI / 4));
+    cx.restore();
+}
+
 var fireLevelBackgroundChars = {
     "x": "wall",
     "!": "lava",
@@ -223,7 +252,8 @@ var fireLevelActorChars = {
     "v": VolcanoLava,
     "f": FireBird,
     "b": FireBolt,
-    "t": Tree
+    "t": Tree,
+    "g": FireStoneGem
 };
 
 var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
@@ -264,6 +294,12 @@ fireLevel.playerTouched = function(type, actor, level) {
             return inDivActor != actor;
         });
         reducePlayerHealth(-25, level, "You ate some fruits.");
+    } else if (type == "fireStoneGem") { //Filter the coin from actor list as it is picked
+        level.actors = level.actors.filter(function(inDivActor) {
+            return inDivActor != actor;
+        });
+        Game.hud.setGameMessage("You have succeeded in getting the Fire stone Gem");
+        return "won";
     } else if (type == "tree") {
         level.player.gravity = 20;
     } else {

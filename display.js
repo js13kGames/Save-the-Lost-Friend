@@ -107,8 +107,11 @@ CanvasDisplay.prototype.drawActors = function() {
         }
     }, this);
     drawLastList.forEach(function(actor) {
-        var x = (actor.pos.x - this.viewport.left) * Game.scale;
-        var y = (actor.pos.y - this.viewport.top) * Game.scale;
-        actor.draw(this.cx, x, y);
+        if (actor.pos.x > this.xStart && actor.pos.x < this.xEnd &&
+            actor.pos.y > this.yStart && actor.pos.y < this.yEnd) {
+            var x = (actor.pos.x - this.viewport.left) * Game.scale;
+            var y = (actor.pos.y - this.viewport.top) * Game.scale;
+            actor.draw(this.cx, x, y);
+        }
     }, this);
 }
