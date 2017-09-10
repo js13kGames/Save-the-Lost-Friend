@@ -73,7 +73,15 @@ function NPC(pos, character, type, color, dialogMsg, isActivated) {
 
 NPC.prototype.draw = function(cx, x, y) {
     cx.save();
-    drawEagle(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
+    if (this.type == "eagle") {
+        drawEagle(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
+    } else if (this.type == "tortoise") {
+        drawTurtoise(cx, x - Game.scale, y + Game.scale, Game.scale / 5);
+    } else if (this.type == "crab") {
+        drawCrab(cx, x - Game.scale, y + Game.scale, Game.scale / 3);
+    } else {
+        drawEagle(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
+    }
     cx.restore();
 }
 
@@ -81,10 +89,10 @@ NPC.prototype.act = function(step, level) {
 
 }
 
-function Bird(pos, character) {
-    NPC.call(this, pos, character, "bird", "black", birdDialogue, true);
+function Tortoise(pos, character) {
+    NPC.call(this, pos, character, "tortoise", "black", birdDialogue, true);
 }
-Bird.prototype = Object.create(NPC.prototype);
+Tortoise.prototype = Object.create(NPC.prototype);
 
 function Crab(pos, character) {
     NPC.call(this, pos, character, "crab", "red", crabDialogue, false);
@@ -201,7 +209,7 @@ Shark.prototype.draw = function(cx, x, y) {
 
 function WaterPlayer(pos) {
     PlayerNonPlatformer.call(this, pos);
-    this.health = 50;
+    this.health = 100;
 }
 WaterPlayer.prototype = Object.create(PlayerNonPlatformer.prototype);
 
@@ -222,7 +230,7 @@ var waterLevelActorChars = {
     "F": FireSignBoard,
     "A": AirSignBoard,
     "q": islandStruct,
-    "B": Bird,
+    "B": Tortoise,
     "T": Owl, //owl
     "C": Crab, // Crab
     "U": Eagle // Eagle
@@ -232,6 +240,10 @@ var dialogEnabledSequence = ["bird", "crab", "eagle", "owl"];
 
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars, dialogEnabledSequence);
 waterLevel.display = CanvasDisplay;
+
+waterLevel.generateLevel = function() {
+    this.level = waterLevelPlan;
+}
 
 waterLevel.playerTouched = function(type, actor, level) {
     if ((type == "shark") && (level.status == null) && (!Game.inInteraction)) {

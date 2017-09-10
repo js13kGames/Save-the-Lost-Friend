@@ -1,4 +1,5 @@
 var Level = function(levelInfo) {
+    levelInfo.generateLevel();
     var plan = levelInfo.level;
     this.levelInfo = levelInfo;
     this.width = plan[0].length;

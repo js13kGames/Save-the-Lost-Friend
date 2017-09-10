@@ -304,8 +304,72 @@ function drawTurtoise(cx, x, y, scale) {
     cx.fill();
 }
 
-function drawCrab(cx, x, y, scale) {
+function drawCrabEyes(cx, x, y, scale, xOffset) {
+    cx.fillStyle = "#FEEEEE";
+    cx.beginPath();
+    cx.arc(x + xOffset * scale, y - 7 * scale, 1 * scale, 0, 2 * Math.PI);
+    cx.fill();
+    cx.stroke();
+    cx.fillStyle = "#222222";
+    cx.beginPath();
+    cx.arc(x + xOffset * scale, y - 7 * scale, 0.2 * scale, 0, 2 * Math.PI);
+    cx.fill();
+}
 
+function drawCrabClaws(cx, x, y, x1, x2, x3, x4, x5, x6, scale) {
+    cx.fillStyle = "#EE3500";
+    cx.lineWidth = 4;
+    cx.beginPath();
+    cx.moveTo(x + x1 * scale, y - 4.2 * scale);
+    cx.lineTo(x + x2 * scale, y - 6 * scale);
+    cx.lineTo(x + x3 * scale, y - 8.5 * scale);
+    cx.lineTo(x + x4 * scale, y - 8.5 * scale);
+    cx.lineTo(x + x4 * scale, y - 6.5 * scale);
+    cx.lineTo(x + x1 * scale, y - 4.5 * scale);
+    cx.closePath();
+    cx.stroke();
+    cx.fill();
+    cx.lineWidth = 3;
+    cx.beginPath();
+    cx.moveTo(x + x5 * scale, y - 9.8 * scale);
+    cx.arc(x + x6 * scale, y - 10.3 * scale, 2 * scale - 5, Math.PI + Math.PI * 1 / 1.7, 0, true);
+    cx.fill();
+    cx.stroke();
+}
+
+function drawCrab(cx, x, y, scale) {
+    cx.lineWidth = 2;
+    cx.lineCap = 'round';
+    cx.fillStyle = "#FF4500"
+        // Top
+    cx.beginPath();
+    cx.moveTo(x + 10 * scale, y - 4.4 * scale);
+    cx.arc(x + 10 * scale, y, 8 * scale - 5, Math.PI + Math.PI * 1 / 5, -Math.PI * 1 / 5);
+    cx.fill();
+    //Bottom
+    cx.fillStyle = "#EE3500"
+    cx.beginPath();
+    cx.moveTo(x + 10 * scale, y - 4.4 * scale);
+    cx.arc(x + 10 * scale, y - 6 * scale, 6.5 * scale - 5, Math.PI - Math.PI / 14, Math.PI / 14, true);
+    cx.fill();
+    // Mouth
+    cx.strokeStyle = "#222222"
+    cx.lineWidth = 4;
+    cx.beginPath();
+    cx.moveTo(x + 6 * scale, y - 4.4 * scale);
+    cx.bezierCurveTo(x + 6 * scale, y - 4.4 * scale,
+        x + 10 * scale, y - 2 * scale,
+        x + 14 * scale, y - 4.4 * scale
+    );
+    cx.stroke();
+
+    //eyes
+    drawCrabEyes(cx, x, y, scale, 7);
+    drawCrabEyes(cx, x, y, scale, 13);
+
+    // Claws            
+    drawCrabClaws(cx, x, y, 4.2, 0, 0.2, 1, 0.4, 0.6, scale);
+    drawCrabClaws(cx, x, y, 15.7, 19.9, 20.1, 18.9, 19.6, 19.4, scale);
 }
 
 var reducePlayerHealth = function(damage, level, message) {

@@ -224,6 +224,10 @@ var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, riverLevelMap, riverLevelB
 riverLevel.display = CanvasDisplay;
 riverLevel.platformerType = "vertical";
 
+riverLevel.generateLevel = function() {
+    this.level = generateRiverLevelWithObstacles(generateRiverBasicLevel(50, 60, xMargin));
+}
+
 riverLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
         cx.fillStyle = "gold";

@@ -246,6 +246,10 @@ var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBack
 fireLevel.display = CanvasDisplay;
 fireLevel.platformerType = "horizontal";
 
+fireLevel.generateLevel = function() {
+    this.level = generateFireLevelWithObstacles(generateFireBasicLevel(200, 50));
+}
+
 fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
         cx.fillStyle = "rgba(170, 170, 50, 255)";

@@ -172,6 +172,10 @@ var airLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, airLevelMap, airLevelBackgro
 airLevel.display = CanvasDisplay;
 airLevel.platformerType = "vertical";
 
+airLevel.generateLevel = function() {
+    this.level = generateAirBasicLevel(50, 60, xMargin, treeHeight);
+}
+
 airLevel.drawBackground = function(backgroundChar, cx, x, y) {
     if (backgroundChar == "wall") {
         cx.fillStyle = "gold";
@@ -188,6 +192,7 @@ airLevel.playerTouched = function(type, actor, level) {
         return "lost";
     } else if (type == "AirGem") { //Filter the coin from actor list as it is picked
         level.player.gravity = 0;
+        level.player.speed.y = -level.player.jumpSpeed;
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });

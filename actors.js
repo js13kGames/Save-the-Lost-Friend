@@ -202,41 +202,6 @@ PlayerNonPlatformer.prototype.checkCollision = function(newPos, level) {
 
 PlayerNonPlatformer.prototype.act = Player.prototype.act;
 
-function Lava(pos, character) {
-    this.pos = pos;
-    this.size = new Vector(1, 1);
-    if (character == "=") { // Horizontal lava
-        this.speed = new Vector(2, 0);
-    } else if (character == "|") { // Vertical up and down lava
-        this.speed = new Vector(0, 2);
-    } else if (character == "v") { // Dripping regenerating lava.
-        // Regenerating lava.
-        this.speed = new Vector(0, 3);
-        this.repeatPos = pos;
-    }
-}
-
-Lava.prototype.type = "lava";
-
-// Called at every step of the animate.
-Lava.prototype.act = function(step, level) {
-    var newPos = this.pos.plus(this.speed.times(step)); // Calculate newPos
-    if (!level.collisionWith(newPos, this.size, "obstacle")) { // If no obstacle set newPos
-        this.pos = newPos
-    } else if (this.repeatPos) {
-        this.pos = this.repeatPos;
-    } else {
-        this.speed = this.speed.times(-1);
-    }
-};
-
-Lava.prototype.draw = function(cx, x, y) {
-    cx.save();
-    cx.fillStyle = "red";
-    cx.fillRect(x, y, Game.scale, Game.scale);
-    cx.restore();
-}
-
 var wobbleSpeed = 8,
     wobbleDist = 0.07;
 
