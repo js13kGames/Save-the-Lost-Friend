@@ -159,9 +159,14 @@ var riverLevelActorChars = {
     "@": RiverPlayer,
     "n": StandingPlatform,
     "|": MovingLog,
-    "#": WinningGoal
+    "g": RiverGem
 };
 
+function RiverGem(pos) {
+    Gem.call(this, pos, "FireStoneGem", "#FE7777", "#FE2222", "river gem.");
+}
+
+RiverGem.prototype = Object.create(Gem.prototype);
 
 function RiverObject(pos, type, color, size) {
     this.pos = pos;
@@ -213,16 +218,6 @@ function StandingPlatform(pos) {
 
 StandingPlatform.prototype = Object.create(RiverObject.prototype);
 
-function WinningGoal(pos) {
-    var xSize = 3; // Size
-    var ySize = 1;
-    var size = new Vector(xSize, ySize);
-    RiverObject.call(this, pos, "WinningGoal", "blue", size);
-    this.speed = new Vector(0, 0);
-}
-
-WinningGoal.prototype = Object.create(RiverObject.prototype);
-
 function ModCanvasDisplay(parent, level) {
     console.log("Mod canvas called");
     CanvasDisplay.call(this, parent, level);
@@ -261,8 +256,11 @@ riverLevel.playerTouched = function(type, actor, level) {
     if (type == "fierce river" && level.status == null) {
         Game.hud.setGameMessage("Drowned in the fierce river.");
         return "lost";
-    } else if (type == "WinningGoal" && level.status == null) {
-        Game.hud.setGameMessage("Hail brave warrior you have crossed the fierce river.");
+    } else if (type == "RiverGem") { //Filter the coin from actor list as it is picked
+        level.actors = level.actors.filter(function(inDivActor) {
+            return inDivActor != actor;
+        });
+        Game.hud.setGameMessage(actor.winMessage);
         return "won";
     }
 }

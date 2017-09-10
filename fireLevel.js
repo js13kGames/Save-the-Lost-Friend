@@ -222,24 +222,10 @@ function FirePlayer(pos) {
 FirePlayer.prototype = Object.create(PlayerPlatformer.prototype);
 
 function FireStoneGem(pos) {
-    this.pos = pos;
-    this.type = "fireStoneGem";
-    this.size = new Vector(2, 2);
+    Gem.call(this, pos, "FireStoneGem", "#FE7777", "#FE2222", "fire gem.");
 }
 
-FireStoneGem.prototype.act = function(step, level) {}
-
-FireStoneGem.prototype.draw = function(cx, x, y) {
-    cx.save();
-    cx.fillStyle = "red";
-    drawArc(cx, x, y, 2 * Game.scale, 0, 2 * Math.PI, true);
-    cx.fillStyle = "orange";
-    drawArc(cx, x, y, 1.7 * Game.scale, 0, 2 * Math.PI, true);
-    cx.strokeStyle = "yellow";
-    cx.moveTo(x, y);
-    cx.lineTo(x + 1.7 * Game.scale * Math.cos(Math.PI / 4), 1.7 * Game.scale * Math.sin(Math.PI / 4));
-    cx.restore();
-}
+FireStoneGem.prototype = Object.create(Gem.prototype);
 
 var fireLevelBackgroundChars = {
     "x": "wall",
@@ -273,14 +259,6 @@ fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
     }
 };
 
-var reducePlayerHealth = function(damage, level, message) {
-    if (level.player.playerHitTimer == 0) {
-        level.player.health -= damage;
-        level.player.playerHitTimer = level.player.playerHitTimerMax;
-        Game.hud.setGameMessage(message);
-    }
-}
-
 fireLevel.playerTouched = function(type, actor, level) {
     if (type == "lava" && level.status == null) {
         Game.hud.setGameMessage("Lava killed you.");
@@ -294,11 +272,11 @@ fireLevel.playerTouched = function(type, actor, level) {
             return inDivActor != actor;
         });
         reducePlayerHealth(-25, level, "You ate some fruits.");
-    } else if (type == "fireStoneGem") { //Filter the coin from actor list as it is picked
+    } else if (type == "FireStoneGem") { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
-        Game.hud.setGameMessage("You have succeeded in getting the Fire stone Gem");
+        Game.hud.setGameMessage(actor.winMessage);
         return "won";
     } else if (type == "tree") {
         level.player.gravity = 20;

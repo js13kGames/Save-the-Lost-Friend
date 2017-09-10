@@ -306,3 +306,11 @@ function drawTurtoise(cx, x, y, scale) {
 function drawCrab(cx, x, y, scale) {
 
 }
+
+var reducePlayerHealth = function(damage, level, message) {
+    if (level.player.playerHitTimer == 0) {
+        level.player.health -= damage;
+        level.player.playerHitTimer = level.player.playerHitTimerMax;
+        Game.hud.setGameMessage(message);
+    }
+}

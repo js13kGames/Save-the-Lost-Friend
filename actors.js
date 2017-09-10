@@ -262,3 +262,20 @@ Coin.prototype.draw = function(cx, x, y) {
     cx.fill();
     cx.restore();
 }
+
+function Gem(pos, type, color1, color2, winMessage) {
+    this.pos = pos;
+    this.type = type;
+    this.size = new Vector(2, 2);
+    this.color1 = color1;
+    this.color2 = color2;
+    this.winMessage = "You have succeeded in getting the " + winMessage;
+};
+
+Gem.prototype.act = function(step, level) {}
+
+Gem.prototype.draw = function(cx, x, y) {
+    cx.save();
+    drawDiamond(cx, x, y, this.color1, this.color2);
+    cx.restore();
+}
