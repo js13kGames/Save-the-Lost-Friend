@@ -102,8 +102,6 @@ Player.prototype.act = function(step, level, keys) {
         level.playerTouched(collidedObject.type, collidedObject);
         if (collidedObject.hasDialog) {
             level.levelInfo.playerInteract(collidedObject, level);
-        } else {
-            Game.inGameMessage = false;
         }
     }
     if (level.status == "lost") { // Losing animation.

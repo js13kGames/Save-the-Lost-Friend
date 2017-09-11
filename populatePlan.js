@@ -93,7 +93,7 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
         var inPos = new Vector(islandX, islandY);
         // Check & set the middle posn.
         if (plan[inPos.y][inPos.x] == null) {
-            setChar(inPos.x, inPos.y, "q");
+            setChar(inPos.x, inPos.y, charToSet);
             structureTiles.push(inPos);
             i = 1;
         }
@@ -105,7 +105,7 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
                 //console.log("In surrounding tiles." + onePos.x + " " + onePos.y + " " + plan[onePos.y][onePos.x]);
                 if (plan[onePos.y][onePos.x] == null) {
                     //console.log("inside plan. " + onePos.x + " " + onePos.y);
-                    setChar(onePos.x, onePos.y, "q");
+                    setChar(onePos.x, onePos.y, charToSet);
                     structureTiles.push(onePos);
                     tobeExploredTiles.push(onePos);
                     i = i + 1;
@@ -142,7 +142,7 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
     var islandYCenter = Math.floor(rowHeight / 2);
 
     var centralStructure = generateStructure(islandXCenter, islandYCenter, numberOfTilesInIsland, isLandChar, directionalPos);
-    console.log("Central island done.", centralStructure, centralStructure.length);
+    //console.log("Central island done.", centralStructure, centralStructure.length);
 
 
     var bottomRightStructure = generateStructure(islandXright, islandYbottom, numberOfTilesInIsland, isLandChar, directionalPos);
@@ -203,6 +203,7 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
         setChar(pos.x, pos.y, charToWrite);
         //console.log("Wrote the" + " " + charToWrite + " in region" + pos.x + " " + pos.y);
     }
+    setChar(islandXCenter, islandYCenter, "P"); // Set Portal in center Island
 
     while (1) {
         var playerX = ~~(2 + Math.random() * (rowWidth / 2));

@@ -10,7 +10,8 @@ var Game = {
     levelKeys: {},
     gemsCollected: {},
     numberOfGemsCollected: 0,
-    gemsPlaced: {}
+    gemsPlaced: {},
+    numberOfGemsPlaced: 0
 };
 
 var Vector = function(x, y) {

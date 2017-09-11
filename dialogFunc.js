@@ -84,7 +84,7 @@ var initNPCDialog = function(creatureName) {
             "welcomeMessage": "Go to the " + gaurdianCreatures[creatureName].island + " island in the " + gaurdianCreatures[creatureName].direction + " to get the gem."
         },
         "3": { // Got gem but not all.
-            "welcomeMessage": "Good to see you have succeeded in getting the " + gaurdianCreatures[creatureName].island + " gem. Get gems from other islands with the help of the other island guardians."
+            "welcomeMessage": "Great! you got the " + gaurdianCreatures[creatureName].island + " island gem. Get gems from other islands."
         },
         "4": { // Got all gems. Yet to return them to central island.
             "welcomeMessage": "Save your friend by placing the gems in central island and opening the portal."

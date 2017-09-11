@@ -104,11 +104,50 @@ function AirIsland(pos) {
 }
 AirIsland.prototype = Object.create(Island.prototype);
 
-function isLandStruct(pos) {
-    Island.call(this, pos, "isLandStruct", "pink");
+function IsLandStruct(pos) {
+    Island.call(this, pos, "isLandStruct", "#F4A460");
+    this.collisionNotRequired = true;
+}
+IsLandStruct.prototype = Object.create(Island.prototype);
+
+function Portal(pos) {
+    this.pos = pos;
+    this.drawLast = true;
+    this.size = new Vector(8, 8);
+    this.type = "portal";
 }
 
-isLandStruct.prototype = Object.create(Island.prototype);
+Portal.prototype.drawPortalArc = function(cx, x, y, startAngle, endAngle, color) {
+    cx.fillStyle = color;
+    cx.beginPath();
+    cx.moveTo(x + 4 * Game.scale, y + 4 * Game.scale);
+    cx.arc(x + 4 * Game.scale, y + 4 * Game.scale, 4 * Game.scale, startAngle, endAngle);
+    cx.fill();
+}
+Portal.prototype.draw = function(cx, x, y) {
+    cx.save();
+    cx.fillStyle = "#2F4F4F";
+    this.drawPortalArc(cx, x, y, 0, Math.PI / 2, "green");
+    this.drawPortalArc(cx, x, y, Math.PI / 2, Math.PI, "brown");
+    this.drawPortalArc(cx, x, y, Math.PI, 1.5 * Math.PI, "grey");
+    this.drawPortalArc(cx, x, y, 1.5 * Math.PI, 2 * Math.PI, "red");
+
+    if (Game.gemsPlaced["water"]) {
+        drawDiamond(cx, x + 4.5 * Game.scale, y + 7 * Game.scale, "#7777FE", "#2222FE");
+    }
+    if (Game.gemsPlaced["earth"]) {
+        drawDiamond(cx, x + 0.5 * Game.scale, y + 7 * Game.scale, "#DEB887", "#DE8857");
+    }
+    if (Game.gemsPlaced["air"]) {
+        drawDiamond(cx, x + 0.5 * Game.scale, y + 3 * Game.scale, "#DCDCDC", "#ECECEC");
+    }
+    if (Game.gemsPlaced["fire"]) {
+        drawDiamond(cx, x + 4.5 * Game.scale, y + 3 * Game.scale, "#FE7777", "#FE2222");
+    }
+    cx.restore();
+}
+
+Portal.prototype.act = function() {};
 
 function Shark(pos, character) {
     this.pos = pos;
@@ -206,7 +245,8 @@ var waterLevelActorChars = {
     "E": EarthIsland,
     "F": FireIsland,
     "A": AirIsland,
-    "q": isLandStruct,
+    "q": IsLandStruct,
+    "P": Portal,
     "B": Tortoise,
     "T": Owl,
     "C": Crab,
@@ -247,6 +287,15 @@ function islandTouch(type) {
     return "won";
 }
 
+function placeGem(type, gemsPlaced) {
+    if (Game.gemsCollected[type] && !Game.gemsPlaced[type]) {
+        Game.gemsPlaced[type] = true;
+        Game.numberOfGemsPlaced++;
+        return " " + type + " ";
+    }
+    return "";
+}
+
 waterLevel.playerTouched = function(type, actor, level) {
     if ((type == "shark") && (level.status == null) && (!Game.inInteraction)) {
         if (level.player.playerHitTimer == 0) {
@@ -260,6 +309,20 @@ waterLevel.playerTouched = function(type, actor, level) {
     }
     if (level.status == null && islandLevel[type]) {
         return islandTouch(type, null);
+    }
+    if (level.status == null && type == "portal") {
+        var gemsType = "";
+        gemsType += placeGem("water");
+        gemsType += placeGem("earth");
+        gemsType += placeGem("air");
+        gemsType += placeGem("fire");
+        if (gemsType != "") {
+            Game.hud.setGameMessage(gemsType + " gem placed in the portal");
+        }
+        if (Game.numberOfGemsPlaced == 4) {
+            Game.hud.setGameMessage("You have rescued your lost friend. You have won");
+            return "won";
+        }
     }
 };
 
@@ -305,9 +368,8 @@ waterLevel.playerInteract = function(triggerObject, level) {
         Game.currentBatchKey = true;
     }
 
-    if (Game.numberOfQuestions == 0 && !Game.inGameMessage) {
+    if (Game.numberOfQuestions == 0) {
         Game.hud.clearScreen();
-        Game.inGameMessage = true;
         Game.hud.setGameMessage(dialogObject.welcomeMessage);
     } else if (!Game.inInteraction && Game.numberOfQuestions != 0 &&
         level.player.skipDialogTimer <= 0) {
