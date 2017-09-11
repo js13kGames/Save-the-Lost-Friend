@@ -58,17 +58,16 @@ function AirSignBoard(pos, character) {
 }
 AirSignBoard.prototype = Object.create(SignBoard.prototype);
 
-function NPC(pos, character, type, color, dialogMsg, isActivated) {
+function NPC(pos, character, type, dialogMsg) {
     this.pos = pos;
     this.pos.y -= 1;
     this.size = new Vector(2, 2);
-    this.color = color;
     this.hasDialog = true;
     this.dialog = new Dialog();
     this.dialog.messages = dialogMsg;
     this.type = type;
-    this.isActivated = isActivated;
     this.drawLast = true;
+    waterLevel.npcs.push(this);
 }
 
 NPC.prototype.draw = function(cx, x, y) {
@@ -90,22 +89,26 @@ NPC.prototype.act = function(step, level) {
 }
 
 function Tortoise(pos, character) {
-    NPC.call(this, pos, character, "tortoise", "black", birdDialogue, true);
+    NPC.call(this, pos, character, "tortoise", tortoiseDialogue);
+    this.island = "water";
 }
 Tortoise.prototype = Object.create(NPC.prototype);
 
 function Crab(pos, character) {
-    NPC.call(this, pos, character, "crab", "red", crabDialogue, false);
+    NPC.call(this, pos, character, "crab", crabDialogue);
+    this.island = "earth";
 }
 Crab.prototype = Object.create(NPC.prototype);
 
 function Eagle(pos, character) {
-    NPC.call(this, pos, character, "eagle", "gold", eagleDialogue, false);
+    NPC.call(this, pos, character, "eagle", eagleDialogue);
+    this.island = "fire";
 }
 Eagle.prototype = Object.create(NPC.prototype);
 
 function Owl(pos, character) {
-    NPC.call(this, pos, character, "owl", "green", owlDialogue, false);
+    NPC.call(this, pos, character, "owl", owlDialogue);
+    this.island = "air";
 }
 Owl.prototype = Object.create(NPC.prototype);
 
@@ -236,13 +239,31 @@ var waterLevelActorChars = {
     "U": Eagle // Eagle
 };
 
-var dialogEnabledSequence = ["bird", "crab", "eagle", "owl"];
-
-var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars, dialogEnabledSequence);
+var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars);
 waterLevel.display = CanvasDisplay;
 
 waterLevel.generateLevel = function() {
     this.level = waterLevelPlan;
+}
+waterLevel.npcs = [];
+npcIslandType = { "earth": "crab", "water": "tortoise", "air": "owl", "fire": "eagle" };
+islandLevel = { "earth": earthLevel, "water": riverLevel, "air": airLevel, "fire": fireLevel };
+
+function islandTouch(type) {
+    var denyEntryMessage = "You need to collect the key from " + npcIslandType[type] + " to enter the " + type + " island";
+    var welcomeMessage = "Welcome to the " + type + " island";
+    var gotGemMessage = "You have already collected the gem from " + type + " island";
+    if (!Game.levelKeys[type]) {
+        Game.hud.setGameMessage(denyEntryMessage);
+        return;
+    }
+    if (Game.gemsCollected[type]) {
+        Game.hud.setGameMessage(gotGemMessage);
+        return;
+    }
+    Game.hud.setGameMessage(welcomeMessage);
+    Game.nextLevel = islandLevel[type];
+    return "won";
 }
 
 waterLevel.playerTouched = function(type, actor, level) {
@@ -256,30 +277,52 @@ waterLevel.playerTouched = function(type, actor, level) {
             return "lost"
         }
     }
-    if (level.status == null) {
-        if (type == "earth") {
-            Game.nextLevel = null;
-            return "won";
-        } else if (type == "fire") {
-            Game.nextLevel = fireLevel;
-            return "won";
-        } else if (type == "water") {
-            Game.nextLevel = riverLevel;
-            return "won";
-        } else if (type == "air") {
-            Game.nextLevel = airLevel;
-            return "won";
-        }
+    if (level.status == null && islandLevel[type]) {
+        return islandTouch(type, null);
     }
 };
 
 waterLevel.playerInteract = function(triggerObject, level) {
-    if (triggerObject.isActivated == false) {
-        return;
-    }
-
     var dialogObject = triggerObject.dialog.getNextQuestionBatch();
+
+    if (triggerObject.dialog.messages.currentBatchKey == "2") {
+        if (!Game.gemsCollected[triggerObject.island]) {
+            Game.levelKeys[triggerObject.island] = true;
+            Game.inInteraction = false;
+            level.player.skipDialogTimer = 4 * level.player.skipDialogTimerMax;
+            Game.hud.setGameMessage(dialogObject.welcomeMessage, false);
+            return;
+        }
+    }
+    if (triggerObject.dialog.messages.currentBatchKey == "3") {
+        if (Game.numberOfGemsCollected != 4) {
+            Game.inInteraction = false;
+            level.player.skipDialogTimer = 4 * level.player.skipDialogTimerMax;
+            Game.hud.setGameMessage(dialogObject.welcomeMessage, false);
+            return;
+        }
+    }
     Game.numberOfQuestions = Object.keys(dialogObject).length - 1;
+    var unAnsweredQ = 0;
+    for (var i = 0; i < Game.numberOfQuestions; i++) {
+        if (dialogObject["" + i].askedStatus == 0) {
+            unAnsweredQ++;
+        }
+    }
+    if (unAnsweredQ == 0 && !triggerObject.dialog.lastBatch()) {
+        triggerObject.dialog.setNextQuestionBatch();
+        dialogObject = triggerObject.dialog.getNextQuestionBatch();
+        Game.currentQuestionNo = 0;
+        Game.numberOfQuestions = Object.keys(dialogObject).length - 1;
+        Game.nextQuestionReady = true;
+    }
+    // Update all NPC current batch to 1 if any one is 1.
+    if (triggerObject.dialog.messages.currentBatchKey == "1" && !Game.currentBatchKey) {
+        waterLevel.npcs.forEach(function(npc) {
+            npc.dialog.messages.currentBatchKey = "1";
+        });
+        Game.currentBatchKey = true;
+    }
 
     if (Game.numberOfQuestions == 0 && !Game.inGameMessage) {
         Game.hud.clearScreen();
@@ -332,26 +375,7 @@ waterLevel.playerInteract = function(triggerObject, level) {
             }
             resetKeyPressed();
         }
-
     }
-    var unAnsweredQ = 0;
-    for (var i = 0; i < Game.numberOfQuestions; i++) {
-        if (dialogObject["" + i].askedStatus == 0) {
-            unAnsweredQ++;
-        }
-    }
-    if (unAnsweredQ == 0 && triggerObject.dialog.lastBatch()) { // TO-DO need to ensure it is activated only once
-        // Activate the next trigger object.            
-        level.activateNextTriggerObject(triggerObject.type);
-    }
-    if (unAnsweredQ == 0 && !triggerObject.dialog.lastBatch()) {
-        triggerObject.dialog.setNextQuestionBatch();
-        dialogObject = triggerObject.dialog.getNextQuestionBatch();
-        Game.currentQuestionNo = 0;
-        Game.numberOfQuestions = Object.keys(dialogObject).length - 1;
-        Game.nextQuestionReady = true;
-    }
-
 };
 
 waterLevel.drawBackground = function(backgroundChar, cx, x, y) {

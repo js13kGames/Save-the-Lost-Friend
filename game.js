@@ -60,19 +60,6 @@ Level.prototype.isFinished = function() {
     return ((this.status != null) && (this.finishDelay < 0));
 };
 
-Level.prototype.activateNextTriggerObject = function(type) {
-    var curIndex = this.levelInfo.dialogEnableSequence.indexOf(type);
-    if (curIndex < this.levelInfo.dialogEnableSequence.length) {
-        var newType = this.levelInfo.dialogEnableSequence[curIndex + 1];
-        for (var i = 0; i < this.actors.length; i++) {
-            if (this.actors[i].type == newType) {
-                this.actors[i].isActivated = true;
-                break
-            }
-        }
-    }
-}
-
 // Check if there is any object in the static layer at the given bounding box of pos and size.
 Level.prototype.collisionWith = function(pos, size, type) {
     var xStart = Math.floor(pos.x);

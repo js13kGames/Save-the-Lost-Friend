@@ -276,11 +276,13 @@ fireLevel.playerTouched = function(type, actor, level) {
             return inDivActor != actor;
         });
         reducePlayerHealth(-25, level, "You ate some fruits.");
-    } else if (type == "FireStoneGem") { //Filter the coin from actor list as it is picked
+    } else if (type == "FireStoneGem" && level.status == null) { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
         Game.level = waterLevel;
+        Game.numberOfGemsCollected++;
+        Game.gemsCollected["fire"] = true;
         Game.hud.setGameMessage(actor.winMessage);
         return "won";
     } else if (type == "tree") {

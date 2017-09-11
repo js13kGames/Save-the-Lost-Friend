@@ -143,12 +143,6 @@ RiverPlayer.prototype.act = function(step, level, keys) {
         this.size.y -= step;
     }
 
-    var triggerObject = level.collisionWith(this.pos, this.size, "trigger");
-    if (triggerObject) {
-        level.levelInfo.playerInteract(triggerObject, level);
-    } else {
-        Game.inGameMessage = false;
-    }
     if (level.player.playerHitTimer > 0) {
         level.player.playerHitTimer--;
     }
@@ -244,11 +238,13 @@ riverLevel.playerTouched = function(type, actor, level) {
     if (type == "fierce river" && level.status == null) {
         Game.hud.setGameMessage("Drowned in the fierce river.");
         return "lost";
-    } else if (type == "RiverGem") { //Filter the coin from actor list as it is picked
+    } else if (type == "RiverGem" && level.status == null) { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
         Game.level = waterLevel;
+        Game.gemsCollected["water"] = true;
+        Game.numberOfGemsCollected++;
         Game.hud.setGameMessage(actor.winMessage);
         return "won";
     }

@@ -6,7 +6,11 @@ var Game = {
     height: 420,
     currentLevel: null,
     inInteraction: false,
-    nextLevel: null
+    nextLevel: null,
+    levelKeys: {},
+    gemsCollected: {},
+    numberOfGemsCollected: 0,
+    gemsPlaced: {}
 };
 
 var Vector = function(x, y) {
