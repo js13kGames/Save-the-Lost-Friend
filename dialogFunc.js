@@ -1,14 +1,5 @@
 function Dialog() {
     this.messages = {};
-    this.enterTriggerRegion = false;
-}
-
-Dialog.prototype.inTriggerRegion = function() {
-    return true;
-}
-
-Dialog.prototype.activated = function() {
-
 }
 
 Dialog.prototype.setNextQuestionBatch = function() {

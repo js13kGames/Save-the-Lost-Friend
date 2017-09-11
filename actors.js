@@ -98,19 +98,19 @@ Player.prototype.act = function(step, level, keys) {
     }
     // Check for collisions with dynamic layer.
     var collidedObject = level.actorAt(this);
-    if (collidedObject)
+    if (collidedObject) {
         level.playerTouched(collidedObject.type, collidedObject);
+        if (collidedObject.hasDialog) {
+            level.levelInfo.playerInteract(collidedObject, level);
+        } else {
+            Game.inGameMessage = false;
+        }
+    }
     if (level.status == "lost") { // Losing animation.
         this.pos.y += step;
         this.size.y -= step;
     }
 
-    var triggerObject = level.collisionWith(this.pos, this.size, "trigger");
-    if (triggerObject) {
-        level.levelInfo.playerInteract(triggerObject, level);
-    } else {
-        Game.inGameMessage = false;
-    }
     if (keys.fly) {
         this.fly = true;
     }

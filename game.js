@@ -6,7 +6,6 @@ var Level = function(levelInfo) {
     this.height = plan.length;
     this.grid = [];
     this.actors = [];
-    this.triggerGrid = [];
     this.islandGrid = [];
 
     var ch;
@@ -16,7 +15,6 @@ var Level = function(levelInfo) {
         for (x = 0; x < this.width; x++) {
             line.push(null);
         }
-        this.triggerGrid.push(line);
     }
 
     for (y = 0; y < this.height; y++) {
@@ -45,13 +43,6 @@ var Level = function(levelInfo) {
     this.player = this.actors.filter(function(actor) { // Get the player instance separately.
         return actor.type == "player";
     })[0];
-    var count = 0;
-    this.actors.forEach(function(actor) {
-        if (actor.hasDialog) {
-            updateTriggerRegion(actor);
-            count++;
-        }
-    }, this);
     this.status = this.finishDelay = null;
 };
 
@@ -74,7 +65,6 @@ Level.prototype.collisionWith = function(pos, size, type) {
 
         grid = this.grid;
     } else if (type == "island") grid = this.islandGrid;
-    else if (type = "trigger") grid = this.triggerGrid;
 
     //  Is there any obstacle overlapping the players bounding box.
     for (var y = yStart; y < yEnd; y++) {
@@ -97,7 +87,7 @@ Level.prototype.actorAt = function(actor) {
         if (other != actor && actor.pos.x + actor.size.x > other.pos.x &&
             actor.pos.x < other.pos.x + other.size.x &&
             actor.pos.y + actor.size.y > other.pos.y &&
-            actor.pos.y < other.pos.y + other.size.y
+            actor.pos.y < other.pos.y + other.size.y && !other.collisionNotRequired
         ) {
             return other;
         }
@@ -133,23 +123,6 @@ Level.prototype.getPlayerProgress = function() {
     else if (this.levelInfo.platformerType == "vertical")
         return ~~(this.height - this.player.pos.y);
 }
-
-var updateTriggerRegion = function(actor) {
-    var pos = actor.pos;
-    var actorId = actor.id;
-    var directionalPos = getDirectionalPos(pos);
-    directionalPos = directionalPos.filter(function(vec) {
-        if (vec.x < Game.currentLevel.width && vec.x > 0 &&
-            vec.y < Game.currentLevel.height && vec.y > 0) {
-            if (!Game.currentLevel.grid[vec.y][vec.x]) {
-                return true;
-            }
-        }
-    });
-    directionalPos.forEach(function(vec) {
-        Game.currentLevel.triggerGrid[vec.y][vec.x] = actor;
-    });
-};
 
 var keyCodes = {
     37: "left",

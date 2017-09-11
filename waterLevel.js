@@ -60,8 +60,6 @@ AirSignBoard.prototype = Object.create(SignBoard.prototype);
 
 function NPC(pos, character, type, dialogMsg) {
     this.pos = pos;
-    this.pos.y -= 1;
-    this.size = new Vector(2, 2);
     this.hasDialog = true;
     this.dialog = new Dialog();
     this.dialog.messages = dialogMsg;
@@ -73,14 +71,16 @@ function NPC(pos, character, type, dialogMsg) {
 NPC.prototype.draw = function(cx, x, y) {
     cx.save();
     if (this.type == "eagle") {
-        drawEagle(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
+        drawEagle(cx, x + Game.scale, y + 3 * Game.scale, Game.scale / 4);
     } else if (this.type == "tortoise") {
-        drawTurtoise(cx, x - Game.scale, y + Game.scale, Game.scale / 5);
+        drawTurtoise(cx, x, y + 2 * Game.scale, Game.scale / 5);
     } else if (this.type == "crab") {
-        drawCrab(cx, x - Game.scale, y + Game.scale, Game.scale / 3);
+        drawCrab(cx, x + 1 * Game.scale, y + 3.5 * Game.scale, Game.scale / 3);
     } else if (this.type = "owl") {
-        drawOwl(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
+        drawOwl(cx, x + 1.8 * Game.scale, y + 1.3 * Game.scale, Game.scale / 4);
     }
+    //cx.fillStyle = "rgba(255, 0, 0, 0.3)";
+    //cx.fillRect(x, y, this.size.x * Game.scale, this.size.y * Game.scale);
     cx.restore();
 }
 
@@ -91,24 +91,28 @@ NPC.prototype.act = function(step, level) {
 function Tortoise(pos, character) {
     NPC.call(this, pos, character, "tortoise", tortoiseDialogue);
     this.island = "water";
+    this.size = new Vector(8, 4);
 }
 Tortoise.prototype = Object.create(NPC.prototype);
 
 function Crab(pos, character) {
     NPC.call(this, pos, character, "crab", crabDialogue);
     this.island = "earth";
+    this.size = new Vector(8, 4);
 }
 Crab.prototype = Object.create(NPC.prototype);
 
 function Eagle(pos, character) {
     NPC.call(this, pos, character, "eagle", eagleDialogue);
     this.island = "fire";
+    this.size = new Vector(4.5, 5);
 }
 Eagle.prototype = Object.create(NPC.prototype);
 
 function Owl(pos, character) {
     NPC.call(this, pos, character, "owl", owlDialogue);
     this.island = "air";
+    this.size = new Vector(5.5, 7);
 }
 Owl.prototype = Object.create(NPC.prototype);
 
@@ -118,6 +122,7 @@ function islandStruct(pos, character) {
     this.size = new Vector(1, 1);
     this.color = "pink";
     this.character = character;
+    this.collisionNotRequired = true;
 }
 
 islandStruct.prototype.draw = function(cx, x, y) {
