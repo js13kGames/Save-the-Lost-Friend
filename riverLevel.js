@@ -32,7 +32,9 @@ function generateRiverLevelWithObstacles(level) {
 
     while (startY > 5) { // Add standing pfs at regular intervals
         // Place platform
-        startX = ~~(xMargin + Math.random() * (endX - xMargin - 10));
+        startX = ~~(width / 2 + Math.random() * (endX - width / 2 - 10)); // bw center and right wall
+        level[startY][startX] = "n";
+        startX = ~~(xMargin + Math.random() * (width / 2 - 10)); //bw left all and center
         level[startY][startX] = "n";
         if (firstTime) {
             level[startY][startX + 1] = "@"; // Place the player at the bottom most board.
@@ -241,7 +243,7 @@ riverLevel.drawBackground = function(backgroundChar, cx, x, y) {
 riverLevel.playerTouched = function(type, actor, level) {
     if (type == "fierce river" && level.status == null) {
         Game.hud.setGameMessage("Drowned in the fierce river.");
-        //return "lost";
+        return "lost";
     } else if (type == "RiverGem") { //Filter the coin from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;

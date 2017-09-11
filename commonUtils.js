@@ -108,6 +108,21 @@ var drawTree = function(cx, x, y, hBranches, vBranches, treeColor) {
     cx.strokeRect(rectStartX - 1, rectStartY, trunkWidth + 2, trunkHeight);
 }
 
+var drawCloud = function(cx, x, y, r1, r2, cloudColor) {
+    cx.lineWidth = 3;
+    cx.lineCap = 'round';
+    cx.fillStyle = cloudColor;
+    cx.strokeStyle = "#606060";
+    var angTopStart = Math.PI;
+    var angTopEnd = 2 * Math.PI;
+    drawArc(cx, x + r1, y + r1 / 2, r1, angTopStart, angTopEnd, true);
+    drawArc(cx, x + 2 * r1 + r2, y + r1 / 2, r2, angTopStart, angTopEnd, true);
+    cx.beginPath();
+    cx.moveTo(x, y + r1 / 2);
+    cx.lineTo(x + 2 * r1 + 2 * r2, y + r1 / 2);
+    cx.stroke();
+}
+
 function drawTriangle(cx, p1, p2, p3, color, noStroke) {
     cx.fillStyle = color;
     cx.beginPath();
@@ -443,7 +458,7 @@ function drawOwl(cx, x, y, scale) {
     // Nose
     cx.lineWidth = 4;
     cx.strokeRect(x + 3.5 * scale, y, 1 * scale, 5 * scale);
-    drawTriangle(cx, new Vector(x + 3.5 * scale, y + 5 * scale), new Vector(x + 7 * scale, y + 6 * scale), new Vector(x + 3.5 * scale, y + 7.5 * scale), "#B8860B", false);
+    drawTriangle(cx, new Vector(x + 3.5 * scale, y + 5 * scale), new Vector(x + 7 * scale, y + 6 * scale), new Vector(x + 3.5 * scale, y + 7.5 * scale), "#FFD700", false);
 
 }
 

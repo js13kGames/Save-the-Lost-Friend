@@ -29,12 +29,7 @@ function generateSteps(level, xMargin, treeHeight) {
             firstTime = false;
         }
         isLeft = !isLeft;
-
-        if (startY > height / 2) {
-            level[startY - 1][startX + 1] = "t";
-        } else {
-            level[startY - 1][startX + 1] = "T";
-        }
+        level[startY - 1][startX + 1] = "t";
         if ((startY < .75 * height) && lastPlaced > cloudDistance) {
             level[startY][~~(width / 2)] = "C";
             lastPlaced = 0;
@@ -88,13 +83,14 @@ function AirGem(pos) {
 AirGem.prototype = Object.create(Gem.prototype);
 
 function EvilCloud(pos) {
-    var xSize = ~~(2 + Math.random() * 5); // Size between 2 to 7.
-    var ySize = 1;
-    var size = new Vector(xSize, ySize);
     var speedX = ~~~(5 + Math.random() * 5); // Speed bw 2 to 7.
     this.speed = new Vector(speedX, 0);
-    this.size = size;
     this.pos = pos;
+    var radius = Game.scale * 2;
+    var minRadius = Game.scale;
+    this.r1 = minRadius + Math.random() * (radius - minRadius);
+    this.r2 = minRadius + Math.random() * (radius - minRadius);
+    this.size = new Vector(2 * (this.r1 / Game.scale) + 2 * (this.r2 / Game.scale), Math.min(this.r1 / Game.scale, this.r2 / Game.scale));
     this.type = "EvilCloud";
 }
 
@@ -110,8 +106,7 @@ EvilCloud.prototype.act = function(step, level) {
 
 EvilCloud.prototype.draw = function(cx, x, y) {
     cx.save();
-    cx.fillStyle = "grey";
-    cx.fillRect(x, y, this.size.x * Game.scale, this.size.y * Game.scale);
+    drawCloud(cx, x, y, this.r1, this.r2, "grey");
     cx.restore();
 }
 
@@ -135,31 +130,13 @@ Tree.prototype.draw = function(cx, x, y) {
     cx.restore();
 }
 
-
-function ConiTree(pos) {
-    var xSize = 4;
-    var ySize = 10;
-    var size = new Vector(xSize, ySize);
-    Tree.call(this, pos, size);
-}
-
-ConiTree.prototype = Object.create(Tree.prototype);
-
-ConiTree.prototype.draw = function(cx, x, y) {
-    cx.save();
-    drawTree(cx, x, y + (2 * Game.scale));
-    cx.restore();
-}
-
 var airLevelBackgroundChars = {
     "x": "wall"
 };
 
-
 var airLevelActorChars = {
     "@": AirPlayer,
     "t": Tree,
-    "T": ConiTree,
     "C": EvilCloud,
     "g": AirGem
 };
