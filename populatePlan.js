@@ -20,15 +20,15 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
     var horizIslandStartPoint = ~~(rowWidth / 2 - islandFixedSize / 2);
     var vertIslandStartPoint = ~~(rowHeight / 2 - islandVertFixedSize / 2);
 
-    // Top and bottom walls, island , Earth and Water sign posts
+    // Top and bottom walls, Earth and Water island
     for (var i = 0; i < rowWidth; i++) {
-        if (i == ~~(horizIslandStartPoint + islandFixedSize / 2)) {
-            setChar(i, 0, "E"); // 0,0; 1,0;...rowWidth-1,0
+        if (i >= horizIslandStartPoint && i < horizIslandStartPoint + islandFixedSize) {
+            setChar(i, 0, "E"); // 0,0; 1,0;...rowWidth-1,0      
+            setChar(i, 1, "E"); // 0,0; 1,0;...rowWidth-1,0
+            setChar(i, 2, "E"); // 0,0; 1,0;...rowWidth-1,0
             setChar(i, rowHeight - 1, "W");
-            //console.log("Earth Signpost, Water signpost." + i);
-        } else if (i >= horizIslandStartPoint && i < horizIslandStartPoint + islandFixedSize) {
-            setChar(i, 0, "e"); // 0,0; 1,0;...rowWidth-1,0      
-            setChar(i, rowHeight - 1, "w");
+            setChar(i, rowHeight - 2, "W");
+            setChar(i, rowHeight - 3, "W");
         } else {
             setChar(i, 0, "x"); // 0,0; 1,0;...rowWidth-1,0
             setChar(i, rowHeight - 1, "x");
@@ -37,19 +37,18 @@ var createPlan = function(rowWidth, rowHeight, isLandSizePercent, remSharkPercen
 
     // Left and right walls.
     for (var j = 0; j < rowHeight; j++) {
-        if (j == ~~(vertIslandStartPoint + islandVertFixedSize / 2)) {
+        if (j >= vertIslandStartPoint && j < vertIslandStartPoint + islandVertFixedSize) {
             setChar(0, j, "A");
+            setChar(1, j, "A");
+            setChar(2, j, "A");
             setChar(rowWidth - 1, j, "F");
-
-        } else if (j >= vertIslandStartPoint && j < vertIslandStartPoint + islandVertFixedSize) {
-            setChar(0, j, "a");
-            setChar(rowWidth - 1, j, "f");
+            setChar(rowWidth - 2, j, "F");
+            setChar(rowWidth - 3, j, "F");
         } else {
             setChar(0, j, "x"); // 0,0;0,1;0,2;....0,rowHeight-1
             setChar(rowWidth - 1, j, "x");
         }
     }
-
     // Create a randomly shaped island.
     var pos = new Vector(0, 0);
     var directionalPos = getDirectionalPos(pos);

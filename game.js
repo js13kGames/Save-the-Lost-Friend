@@ -28,7 +28,7 @@ var Level = function(levelInfo) {
             var Actor = levelInfo.actorChars[ch]; // Is it an dynamic item. Get the constructor for same.            
             if (Actor) {
                 this.actors.push(new Actor(new Vector(x, y), ch)); // Instantate the actor. Needs the vector,ch
-                if (ch == "q") {
+                if (levelInfo.islandChars && levelInfo.islandChars[ch]) {
                     islandFieldType = levelInfo.actorChars[ch];
                 }
             } else {

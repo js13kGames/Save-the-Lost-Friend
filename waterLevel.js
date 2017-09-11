@@ -7,57 +7,6 @@ var numberOfTilesInIsland = 100;
 
 waterLevelPlan = createPlan(rowWidth, rowHeight, isLandSizePercent, remSharkPercent, remLogPercent, numberOfTilesInIsland);
 
-function SignBoard(pos, character, type, color) {
-    this.pos = pos;
-    this.size = new Vector(1, 1);
-    this.color = color;
-    this.type = type;
-    this.hasDialog = true;
-    this.isActivated = true;
-    addSignPostDialog.call(this, type);
-}
-
-SignBoard.prototype.draw = function(cx, x, y) {
-    cx.save();
-    cx.fillStyle = this.color;
-    cx.fillRect(x, y, Game.scale, Game.scale);
-    cx.restore();
-}
-
-SignBoard.prototype.act = function(step, level) {
-
-}
-
-function addSignPostDialog(islandType) {
-    this.dialog = new Dialog();
-    this.dialog.messages = {
-        "0": {
-            "welcomeMessage": "Welcome to " + islandType + " island signboard."
-        },
-        "currentBatchKey": "0"
-    }; // Only welcome msg for the sign post dialog. 
-}
-
-function EarthSignBoard(pos, character) {
-    SignBoard.call(this, pos, character, "earth", "brown");
-}
-EarthSignBoard.prototype = Object.create(SignBoard.prototype);
-
-function WaterSignBoard(pos, character) {
-    SignBoard.call(this, pos, character, "water", "green");
-}
-WaterSignBoard.prototype = Object.create(SignBoard.prototype);
-
-function FireSignBoard(pos, character) {
-    SignBoard.call(this, pos, character, "fire", "red");
-}
-FireSignBoard.prototype = Object.create(SignBoard.prototype);
-
-function AirSignBoard(pos, character) {
-    SignBoard.call(this, pos, character, "air", "white");
-}
-AirSignBoard.prototype = Object.create(SignBoard.prototype);
-
 function NPC(pos, character, type, dialogMsg) {
     this.pos = pos;
     this.hasDialog = true;
@@ -117,26 +66,49 @@ function Owl(pos, character) {
 Owl.prototype = Object.create(NPC.prototype);
 
 
-function islandStruct(pos, character) {
+function Island(pos, type, color) {
     this.pos = pos;
     this.size = new Vector(1, 1);
-    this.color = "pink";
-    this.character = character;
-    this.collisionNotRequired = true;
+    this.color = color;
+    this.type = type;
 }
 
-islandStruct.prototype.draw = function(cx, x, y) {
+Island.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = this.color;
     cx.fillRect(x, y, Game.scale, Game.scale);
     cx.restore();
 }
 
-islandStruct.prototype.act = function(step, level) {
+Island.prototype.act = function(step, level) {
 
 }
-islandStruct.prototype.type = "islandStruct";
 
+function EarthIsland(pos) {
+    Island.call(this, pos, "earth", "brown");
+}
+EarthIsland.prototype = Object.create(Island.prototype);
+
+function WaterIsland(pos) {
+    Island.call(this, pos, "water", "green");
+}
+WaterIsland.prototype = Object.create(Island.prototype);
+
+function FireIsland(pos) {
+    Island.call(this, pos, "fire", "red");
+}
+FireIsland.prototype = Object.create(Island.prototype);
+
+function AirIsland(pos) {
+    Island.call(this, pos, "air", "grey");
+}
+AirIsland.prototype = Object.create(Island.prototype);
+
+function isLandStruct(pos) {
+    Island.call(this, pos, "isLandStruct", "pink");
+}
+
+isLandStruct.prototype = Object.create(Island.prototype);
 
 function Shark(pos, character) {
     this.pos = pos;
@@ -218,30 +190,27 @@ Shark.prototype.draw = function(cx, x, y) {
 function WaterPlayer(pos) {
     PlayerNonPlatformer.call(this, pos);
     this.health = 100;
+    this.drawLast = true;
 }
 WaterPlayer.prototype = Object.create(PlayerNonPlatformer.prototype);
 
 var waterLevelBackgroundChars = {
     "x": "wall",
-    "l": "log",
-    "w": "water",
-    "e": "earth",
-    "f": "fire",
-    "a": "air"
+    "l": "log"
 };
 
 var waterLevelActorChars = {
     "@": WaterPlayer,
     "s": Shark,
-    "W": WaterSignBoard,
-    "E": EarthSignBoard,
-    "F": FireSignBoard,
-    "A": AirSignBoard,
-    "q": islandStruct,
+    "W": WaterIsland,
+    "E": EarthIsland,
+    "F": FireIsland,
+    "A": AirIsland,
+    "q": isLandStruct,
     "B": Tortoise,
-    "T": Owl, //owl
-    "C": Crab, // Crab
-    "U": Eagle // Eagle
+    "T": Owl,
+    "C": Crab,
+    "U": Eagle
 };
 
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars);
@@ -253,6 +222,13 @@ waterLevel.generateLevel = function() {
 waterLevel.npcs = [];
 npcIslandType = { "earth": "crab", "water": "tortoise", "air": "owl", "fire": "eagle" };
 islandLevel = { "earth": earthLevel, "water": riverLevel, "air": airLevel, "fire": fireLevel };
+waterLevel.islandChars = {
+    "q": "0",
+    "E": "1",
+    "W": "2",
+    "F": "3",
+    "A": "4"
+};
 
 function islandTouch(type) {
     var denyEntryMessage = "You need to collect the key from " + npcIslandType[type] + " to enter the " + type + " island";
