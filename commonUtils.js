@@ -372,6 +372,81 @@ function drawCrab(cx, x, y, scale) {
     drawCrabClaws(cx, x, y, 15.7, 19.9, 20.1, 18.9, 19.6, 19.4, scale);
 }
 
+function drawOwlEyes(cx, x, y, xOffset, scale) {
+    function drawCircle(x, y, r, color, stroke) {
+        cx.fillStyle = color;
+        cx.beginPath();
+        cx.moveTo(x, y);
+        cx.arc(x, y, r, 0, 2 * Math.PI);
+        if (stroke) cx.stroke();
+        cx.fill();
+    }
+    drawCircle(x, y + 3 * scale, 4 * scale, "#EEEEEE", true);
+    drawCircle(x + scale / 3, y + 2.8 * scale, 2.4 * scale, "#B8860B", true);
+    drawCircle(x + scale / 3, y + 2.8 * scale, 1 * scale, "#222222", true);
+    drawCircle(x - 0.4 * scale, y + 1.7 * scale, 0.8 * scale, "#EEEEEE", false);
+}
+
+function drawOwl(cx, x, y, scale) {
+    cx.lineCap = 'round';
+
+    // Body
+    cx.fillStyle = "#B8860B"
+    cx.strokeStyle = "#B8860B"
+    cx.lineWidth = 4;
+    cx.beginPath();
+    cx.moveTo(x - 3 * scale, y + 6.3 * scale);
+    cx.bezierCurveTo(x - 4 * scale, y + 10 * scale,
+        x - 5 * scale, y + 12 * scale,
+        x + 1 * scale, y + 20 * scale
+    );
+    cx.moveTo(x + 11 * scale, y + 6.3 * scale);
+    cx.bezierCurveTo(x + 12 * scale, y + 10 * scale,
+        x + 13 * scale, y + 12 * scale,
+        x + 8 * scale, y + 20 * scale
+    );
+    cx.stroke();
+    cx.fill();
+
+    cx.beginPath();
+    cx.moveTo(x - 3 * scale, y + 6.3 * scale);
+    cx.lineTo(x + 1 * scale, y + 20 * scale);
+    cx.lineTo(x + 8 * scale, y + 20 * scale);
+    cx.lineTo(x + 11 * scale, y + 6.3 * scale);
+    cx.closePath();
+    cx.fill();
+    cx.stroke();
+
+    cx.strokeStyle = "#222222";
+    cx.lineWidth = 10;
+    cx.beginPath();
+    cx.moveTo(x - 3.5 * scale, y + 6.3 * scale);
+    cx.bezierCurveTo(x - 4.5 * scale, y + 10 * scale,
+        x - 5 * scale, y + 12 * scale,
+        x - 2.8 * scale, y + 15 * scale
+    );
+    cx.moveTo(x + 11.5 * scale, y + 6.3 * scale);
+    cx.bezierCurveTo(x + 12.5 * scale, y + 10 * scale,
+        x + 13 * scale, y + 12 * scale,
+        x + 11.3 * scale, y + 15 * scale
+    );
+    cx.stroke();
+
+    cx.strokeStyle = "#222222";
+    cx.lineWidth = 8;
+    drawOwlEyes(cx, x, y, 0, scale);
+    drawOwlEyes(cx, x + 8 * scale, y, 0, scale);
+    cx.fillStyle = "#B8860B"
+        // Head
+    drawTriangle(cx, new Vector(x, y - 2 * scale), new Vector(x + 4 * scale, y), new Vector(x + 8 * scale, y - 2 * scale), "#B8860B", false);
+    cx.fillRect(x + 3.5 * scale, y, 1 * scale, 5 * scale);
+    // Nose
+    cx.lineWidth = 4;
+    cx.strokeRect(x + 3.5 * scale, y, 1 * scale, 5 * scale);
+    drawTriangle(cx, new Vector(x + 3.5 * scale, y + 5 * scale), new Vector(x + 7 * scale, y + 6 * scale), new Vector(x + 3.5 * scale, y + 7.5 * scale), "#B8860B", false);
+
+}
+
 var reducePlayerHealth = function(damage, level, message) {
     if (level.player.playerHitTimer == 0) {
         level.player.health -= damage;

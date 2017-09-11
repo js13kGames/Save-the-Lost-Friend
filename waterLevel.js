@@ -79,8 +79,8 @@ NPC.prototype.draw = function(cx, x, y) {
         drawTurtoise(cx, x - Game.scale, y + Game.scale, Game.scale / 5);
     } else if (this.type == "crab") {
         drawCrab(cx, x - Game.scale, y + Game.scale, Game.scale / 3);
-    } else {
-        drawEagle(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
+    } else if (this.type = "owl") {
+        drawOwl(cx, x - Game.scale, y + Game.scale, Game.scale / 4);
     }
     cx.restore();
 }
