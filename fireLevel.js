@@ -159,9 +159,9 @@ Tree.prototype.act = function(step, level) {
         for (var i = 0; i < numberOfBerries; i++) {
             var xOffset = getRandomElement([-(this.horizBranchNos - 1), -1, 0, 1, 2, this.horizBranchNos + 1]);
             var yOffset = -1 * (7 + ~~(Math.random() * this.vertBranchNos));
-            var coin = new Coin(new Vector(this.pos.x + xOffset, this.pos.y + yOffset));
-            coin.drawLast = true;
-            level.actors.push(coin);
+            var berry = new Berry(new Vector(this.pos.x + xOffset, this.pos.y + yOffset));
+            berry.drawLast = true;
+            level.actors.push(berry);
         }
         this.addFruits = true;
     }
@@ -271,12 +271,13 @@ fireLevel.playerTouched = function(type, actor, level) {
         reducePlayerHealth(50, level, "Beware of the Fire Bolt.");
     } else if (type == "volcanoLava") {
         reducePlayerHealth(50, level, "Beware of the Volcanic Lava.");
-    } else if (type == "coin") { //Filter the coin from actor list as it is picked
+    } else if (type == "berry") { //Filter the berry from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
-        reducePlayerHealth(-25, level, "You ate some fruits.");
-    } else if (type == "FireStoneGem" && level.status == null) { //Filter the coin from actor list as it is picked
+        level.player.health += 10;
+        Game.hud.setGameMessage("You ate some fruits and gained health");
+    } else if (type == "FireStoneGem" && level.status == null) {
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });

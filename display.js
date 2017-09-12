@@ -1,22 +1,12 @@
-function flipHorizontally(context, around) {
-    context.translate(around, 0);
-    context.scale(-1, 1);
-    context.translate(-around, 0);
-}
-
 function CanvasDisplay(parent, level) {
     this.canvas = document.createElement("canvas");
     this.canvas.id = "gameScreen";
     this.canvas.width = Math.min(Game.width, level.width * Game.scale);
     this.canvas.height = Math.min(Game.height, level.height * Game.scale);
-    this.canvas.style = "z-index: 1;position:absolute;left:0px;top:0px;";
+    this.canvas.style = "z-index: 1;padding:0;margin:auto;display:block;width:" + this.canvas.width + "px;height:" + this.canvas.height + "px;position:absolute;top:0;bottom:0;left:0;right:0;";
     parent.appendChild(this.canvas);
     this.cx = this.canvas.getContext("2d");
-
     this.level = level;
-    this.animationTime = 0;
-    this.flipPlayer = false;
-
     this.viewport = {
         left: 0,
         top: 0,
@@ -32,8 +22,6 @@ CanvasDisplay.prototype.clear = function() {
 };
 
 CanvasDisplay.prototype.drawFrame = function(step) {
-    this.animationTime += step;
-
     this.updateViewport();
     this.clearDisplay();
     this.drawBackground();

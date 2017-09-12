@@ -3,7 +3,7 @@ var Game = {
     gamePaused: false,
     tileSize: 20,
     width: 1000,
-    height: 420,
+    height: 600,
     currentLevel: null,
     inInteraction: false,
     nextLevel: null,

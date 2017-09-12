@@ -5,7 +5,7 @@ function InGameHUD(parent) {
     this.canvas.id = "hud";
     this.canvas.width = Game.width;
     this.canvas.height = Game.height + 40;
-    this.canvas.style = "z-index: 2;position:absolute;left:0px;top:0px;";
+    this.canvas.style = "z-index:2;padding:0;margin:auto;display:block;width:" + this.canvas.width + "px;height:" + this.canvas.height + "px;position:absolute;top:0;bottom:0;left:0;right:0;";
     this.cx = this.canvas.getContext("2d");
     parent.appendChild(this.canvas);
     this.healthBar = null;
@@ -35,14 +35,19 @@ InGameHUD.prototype.setGameMessage = function(message, noTimeOut) {
 }
 
 
-InGameHUD.prototype.drawBar = function(x, y, width, height, value, max) {
+InGameHUD.prototype.drawBar = function(x, y, width, height, value, max, message) {
     this.cx.save();
+    if (value > max) value = max;
     var greenValue = ~~((value / max) * width); // Draw the red scroll bar.
     this.cx.fillStyle = "red";
     this.cx.fillRect(x + greenValue, y, width - greenValue, height);
     this.cx.fillStyle = "green";
     this.cx.fillRect(x, y, greenValue, height); // Draw the green scroll bar.
     this.cx.restore();
+    this.cx.fillStyle = "grey";
+    this.cx.font = "14pt Georgia";
+    var textWidth = this.cx.measureText(message).width;
+    this.cx.fillText(message, x - textWidth - 5, y + 10);
 }
 
 InGameHUD.prototype.drawGameMessage = function(message, lineNum, highLight) {
@@ -102,14 +107,15 @@ InGameHUD.prototype.clear = function() {
 
 // Remove an element to be drawn.
 InGameHUD.prototype.draw = function() {
+    this.cx.fillStyle = "rgb(238, 238, 170)";
     this.cx.fillRect(0, Game.height, Game.width, 40);
     if (this.healthBar) {
         var value = this.healthBar.context[this.healthBar.funcToCall]();
-        this.drawBar(Game.width - 130, Game.height + 20, 100, 10, value, this.healthBar.maxValue);
+        this.drawBar(Game.width - 130, Game.height + 20, 100, 10, value, this.healthBar.maxValue, "Health");
     }
     if (this.playerProgressBar) {
         var value = this.playerProgressBar.context[this.playerProgressBar.funcToCall]();
-        this.drawBar(Game.width / 2 - 100, Game.height + 20, 200, 10, value, this.playerProgressBar.maxValue);
+        this.drawBar(100, Game.height + 20, 200, 10, value, this.playerProgressBar.maxValue, "Progress");
     }
     if (this.gameMessage) {
         this.drawGameMessage(this.gameMessage);

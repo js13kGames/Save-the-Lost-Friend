@@ -238,7 +238,7 @@ riverLevel.playerTouched = function(type, actor, level) {
     if (type == "fierce river" && level.status == null) {
         Game.hud.setGameMessage("Drowned in the fierce river.");
         return "lost";
-    } else if (type == "RiverGem" && level.status == null) { //Filter the coin from actor list as it is picked
+    } else if (type == "RiverGem" && level.status == null) {
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });

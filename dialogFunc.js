@@ -43,15 +43,10 @@ var initNPCDialog = function(creatureName) {
             "welcomeMessage": "Glad to see you have not yet given up on your quest to rescue your lost friend.",
             "0": {
                 "question": "Do you know me? I have lost all memory and do not remember.",
-                "answer": "Know you?? Now thats a deep question. I do not even know myself.",
+                "answer": "You are the brave adventurer, who is risking his life to save his lost friend.",
                 "askedStatus": 0
             },
             "1": {
-                "question": " Have you seen me before?",
-                "answer": "Yes , this is the third time you are here.",
-                "askedStatus": 0
-            },
-            "2": {
                 "question": " Do you know what happened to my lost friend?",
                 "answer": "Yes, a portal opened and many people including your friend disappeared through it.",
                 "askedStatus": 0
@@ -65,7 +60,7 @@ var initNPCDialog = function(creatureName) {
                 "askedStatus": 0
             },
             "1": {
-                "question": "What do I need to do?",
+                "question": "What do I need to do to rescue my friend?",
                 "answer": "Retrieve the " + gaurdianCreatures[creatureName].island + " gem from the " + gaurdianCreatures[creatureName].island + " island.",
                 "askedStatus": 0
             },

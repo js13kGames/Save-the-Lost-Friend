@@ -10,7 +10,6 @@ function generateSteps(level, xMargin, treeHeight) {
     var maxYDist = ~~(1.5 * treeHeight);
     var startY = height - 2;
     var stepWidth, startX, yStep;
-    var firstTime = true;
     var lastPlaced = 0;
     var cloudDistance = 10;
     while (startY > 5) { // Add standing steps at regular intervals
@@ -24,10 +23,7 @@ function generateSteps(level, xMargin, treeHeight) {
         for (var i = 0; i < stepWidth; i++) {
             level[startY][startX + i] = "x";
         }
-        if (firstTime) {
-            level[startY][startX] = "@"; // Place the player at the bottom most board.
-            firstTime = false;
-        }
+
         isLeft = !isLeft;
         level[startY - 1][startX + 1] = "t";
         if ((startY < .75 * height) && lastPlaced > cloudDistance) {
@@ -40,6 +36,8 @@ function generateSteps(level, xMargin, treeHeight) {
     }
     // Set the winning goal character.
     level[2][~~(width / 2)] = "g";
+    level[height - 5][~~(width / 2)] = "@"; // Place the player at the bottom.
+    firstTime = false;
     return level;
 }
 
@@ -167,7 +165,7 @@ airLevel.playerTouched = function(type, actor, level) {
     if (type == "fierce river" && level.status == null) {
         Game.hud.setGameMessage("You crashed into the abyss.");
         return "lost";
-    } else if (type == "AirGem" && level.status == null) { //Filter the coin from actor list as it is picked
+    } else if (type == "AirGem" && level.status == null) {
         level.player.gravity = 0;
         level.player.speed.y = -level.player.jumpSpeed;
         level.actors = level.actors.filter(function(inDivActor) {

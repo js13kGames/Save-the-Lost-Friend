@@ -91,7 +91,6 @@ Player.prototype.move = function(step, level, keys) {
 // Call the moveX & moveY  ( checks collision with static layer.)
 // Check for collisions with dynamic layer.
 // If yes call playerTouched
-// status is lost losing animation.
 Player.prototype.act = function(step, level, keys) {
     if (!Game.inInteraction) {
         this.move(step, level, keys);
@@ -125,7 +124,10 @@ Player.prototype.act = function(step, level, keys) {
 
 Player.prototype.draw = function(cx, x, y) {
     cx.save();
-    cx.fillStyle = "gold";
+    if (Game.currentLevel.player.playerHitTimer > 0)
+        cx.fillStyle = "rgba(200, 0, 0, 0.7)";
+    else
+        cx.fillStyle = "gold";
     cx.fillRect(x, y, Game.scale * 3 / 4, Game.scale * 3 / 2);
     cx.fillStyle = "black";
     if (this.facingRight) {
@@ -203,25 +205,20 @@ PlayerNonPlatformer.prototype.act = Player.prototype.act;
 var wobbleSpeed = 8,
     wobbleDist = 0.07;
 
-function Coin(pos) {
-    this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
-    this.size = new Vector(0.6, 0.6);
-    this.wobble = Math.random() * Math.PI * 2;
+function Berry(pos) {
+    this.pos = pos;
+    this.size = new Vector(1, 1);
 }
 
-Coin.prototype.type = "coin";
+Berry.prototype.type = "berry";
 
-Coin.prototype.act = function(step) {
-    this.wobble += step * wobbleSpeed; // Calc wobble
-    var wobblePos = Math.sin(this.wobble) * wobbleDist; // Math.sin of wobble times wobbleDist is Wobblepos
-    this.pos = this.basePos.plus(new Vector(0, wobblePos)); // calculate pos.
-};
+Berry.prototype.act = function(step) {};
 
-Coin.prototype.draw = function(cx, x, y) {
+Berry.prototype.draw = function(cx, x, y) {
     cx.save();
-    cx.fillStyle = "yellow";
+    cx.fillStyle = "#DC143C";
     cx.beginPath();
-    cx.arc(x, y, Game.scale / 5, 0, 2 * Math.PI);
+    cx.arc(x, y, Game.scale / 2, 0, 2 * Math.PI);
     cx.fill();
     cx.restore();
 }

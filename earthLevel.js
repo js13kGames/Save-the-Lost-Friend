@@ -34,7 +34,7 @@ function generateEarthLevelWithObstacles(level) {
         troughMinSize = 10;
     var isFlat = true;
     startX = startX + initialOffset;
-    var actorList = { "0": "FIREBIRD", "1": "VOLCANO", "2": "TREE" };
+    var actorList = { "0": "FIREBIRD", "1": "VOLCANO" };
     while (startX < width - 10) {
         var enemySelect = actorList[String(~~(Math.random() * Object.keys(actorList).length))];
         var droppingEnemyHolderSize = 5;
@@ -63,11 +63,6 @@ function generateEarthLevelWithObstacles(level) {
                 margin = margin - 1;
             }
             startX = startX + volcanoSize;
-            isFlat = false;
-        } else if (enemySelect == "TREE" && isFlat == true) {
-            var treeSize = 5;
-            level[startY][startX + 2] = "t";
-            startX = startX + treeSize;
             isFlat = false;
         } else if (isFlat == false) {
             startX += flatRegion;
@@ -139,38 +134,6 @@ EarthBird.prototype.draw = function(cx, x, y) {
     cx.fillRect(x, y, this.size.x * Game.scale, this.size.y * Game.scale);
     cx.fillStyle = "yellow";
     cx.fillRect(x + 4, y + 4, this.size.x * Game.scale - 8, this.size.y * Game.scale - 8);
-    cx.restore();
-}
-
-function Tree(pos, character) {
-    this.pos = pos;
-    this.size = new Vector(3, 12);
-    this.horizBranchNos = 3 + getRandomElement([2, 4])
-    this.vertBranchNos = 4 + ~~(Math.random() * 4);
-    this.treeColor = "green";
-    this.addFruits = false;
-}
-
-Tree.prototype.type = "tree";
-
-Tree.prototype.act = function(step, level) {
-    if (!this.addFruits) {
-        var numberOfBerries = 2 + ~~(Math.random() * 4);
-        for (var i = 0; i < numberOfBerries; i++) {
-            var xOffset = getRandomElement([-(this.horizBranchNos - 1), -1, 0, 1, 2, this.horizBranchNos + 1]);
-            var yOffset = -1 * (7 + ~~(Math.random() * this.vertBranchNos));
-            var coin = new Coin(new Vector(this.pos.x + xOffset, this.pos.y + yOffset));
-            coin.drawLast = true;
-            level.actors.push(coin);
-        }
-        this.addFruits = true;
-    }
-};
-
-Tree.prototype.draw = function(cx, x, y) {
-    cx.save();
-    //console.log(this.pos.x * Game.scale + " " + this.pos.y * Game.scale + " " + x + " " + y);   
-    drawTree(cx, x, y + (1 * Game.scale), this.horizBranchNos, this.vertBranchNos, this.treeColor);
     cx.restore();
 }
 
@@ -271,12 +234,7 @@ earthLevel.playerTouched = function(type, actor, level) {
         reducePlayerHealth(50, level, "Beware of the Earth Bolt.");
     } else if (type == "volcanoLava") {
         reducePlayerHealth(50, level, "Beware of the Volcanic Lava.");
-    } else if (type == "coin") { //Filter the coin from actor list as it is picked
-        level.actors = level.actors.filter(function(inDivActor) {
-            return inDivActor != actor;
-        });
-        reducePlayerHealth(-25, level, "You ate some fruits.");
-    } else if (type == "EarthStoneGem" && level.status == null) { //Filter the coin from actor list as it is picked
+    } else if (type == "EarthStoneGem" && level.status == null) {
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;
         });
@@ -285,10 +243,6 @@ earthLevel.playerTouched = function(type, actor, level) {
         Game.gemsCollected["earth"] = true;
         Game.hud.setGameMessage(actor.winMessage);
         return "won";
-    } else if (type == "tree") {
-        level.player.gravity = 20;
-    } else {
-        level.player.gravity = level.player.gravityConst;
     }
 
     if (level.player.health <= 0 && level.status == null) {

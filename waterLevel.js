@@ -76,7 +76,7 @@ function Island(pos, type, color) {
 Island.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = this.color;
-    cx.fillRect(x, y, Game.scale, Game.scale);
+    cx.fillRect(x, y, Game.scale + 1, Game.scale + 1);
     cx.restore();
 }
 
@@ -424,14 +424,16 @@ waterLevel.playerInteract = function(triggerObject, level) {
 waterLevel.drawBackground = function(backgroundChar, cx, x, y) {
     var tileColor = {
         "wall": "yellow",
-        "log": "brown",
-        "water": "#44bb22",
-        "fire": "orange",
-        "air": "grey",
-        "earth": "#aa5522"
+        "log": "brown"
     }
     cx.save();
     cx.fillStyle = tileColor[backgroundChar];
-    cx.fillRect(x, y, Game.scale, Game.scale);
-    cx.restore();
+    if (backgroundChar == "log") {
+        cx.fillStyle = "white";
+        cx.fillRect(x - 4, y + Game.scale - 1, Game.scale + 8, 4);
+        drawTriangle(cx, new Vector(x, y + Game.scale), new Vector(x + 0.5 * Game.scale, y), new Vector(x + Game.scale, y + Game.scale), "brown");
+    } else {
+        cx.fillRect(x, y, Game.scale + 1, Game.scale + 1);
+        cx.restore();
+    }
 };
