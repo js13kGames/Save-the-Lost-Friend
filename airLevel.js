@@ -67,8 +67,7 @@ function generateAirBasicLevel(width, height, xMargin, treeHeight) {
 function AirPlayer(pos) {
     PlayerPlatformer.call(this, pos);
     this.drawLast = true;
-    this.health = 100;
-    this.flyPower = 1000;
+    this.flyPower = 9000;
     this.fly = true;
 }
 
@@ -81,7 +80,7 @@ function AirGem(pos) {
 AirGem.prototype = Object.create(Gem.prototype);
 
 function EvilCloud(pos) {
-    var speedX = ~~~(5 + Math.random() * 5); // Speed bw 2 to 7.
+    var speedX = ~~~(5 + Math.random() * 10);
     this.speed = new Vector(speedX, 0);
     this.pos = pos;
     var radius = Game.scale * 2;
@@ -141,13 +140,13 @@ var airLevelActorChars = {
 
 var xMargin = 1;
 var treeHeight = 5;
-var airLevelMap = generateAirBasicLevel(50, 60, xMargin, treeHeight);
+var airLevelMap = generateAirBasicLevel(40, 200, xMargin, treeHeight);
 
 var airLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, airLevelMap, airLevelBackgroundChars, airLevelActorChars);
 airLevel.platformerType = "vertical";
 
 airLevel.generateLevel = function() {
-    this.level = generateAirBasicLevel(50, 60, xMargin, treeHeight);
+    this.level = generateAirBasicLevel(40, 200, xMargin, treeHeight);
 }
 
 airLevel.drawBackground = function(backgroundChar, cx, x, y) {
@@ -161,10 +160,7 @@ airLevel.drawBackground = function(backgroundChar, cx, x, y) {
 };
 
 airLevel.playerTouched = function(type, actor, level) {
-    if (type == "fierce river" && level.status == null) {
-        Game.hud.setGameMessage("You crashed into the abyss.");
-        return "lost";
-    } else if (type == "AirGem" && level.status == null) {
+    if (type == "AirGem" && level.status == null) {
         level.player.gravity = 0;
         level.player.speed.y = -level.player.jumpSpeed;
         level.actors = level.actors.filter(function(inDivActor) {

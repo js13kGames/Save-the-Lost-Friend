@@ -20,7 +20,7 @@ function generateEarthLevelWithObstacles(level) {
     return level;
 }
 
-var earthLevelMap = generateEarthLevelWithObstacles(generateFireBasicLevel(200, 50));
+var earthLevelMap = generateEarthLevelWithObstacles(generateFireBasicLevel(300, 50));
 
 function Cactus(pos, character) {
     this.size = new Vector(3, (2 + ~~(Math.random() * 8)));
@@ -45,13 +45,15 @@ Cactus.prototype.draw = function(cx, x, y) {
 function EarthPlayer(pos) {
     PlayerPlatformer.call(this, pos);
     this.drawLast = true;
-    this.health = 100;
     this.jumpSpeed = 20;
-    this.flyPower = 0;
 }
 EarthPlayer.prototype = Object.create(PlayerPlatformer.prototype);
 EarthPlayer.prototype.moveX = function(step, level, keys) {
-    this.speed.x = 9;
+    if (this.pos.x > level.width - 4) {
+        PlayerPlatformer.prototype.moveX.call(this, step, level, keys);
+        return;
+    }
+    this.speed.x = 8;
     var motion = new Vector(this.speed.x * step, 0);
     var newPos = this.pos.plus(motion);
     this.pos = newPos;
@@ -59,13 +61,13 @@ EarthPlayer.prototype.moveX = function(step, level, keys) {
 
 function EarthStoneGem(pos) {
     Gem.call(this, pos, "EarthStoneGem", "#DEB887", "#DE8857", "earth gem.");
+    this.size = new Vector(4, 4);
 }
 
 EarthStoneGem.prototype = Object.create(Gem.prototype);
 
 var earthLevelBackgroundChars = {
-    "x": "wall",
-    "!": "lava"
+    "x": "wall"
 };
 
 var earthLevelActorChars = {
@@ -78,7 +80,7 @@ var earthLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, earthLevelMap, earthLevelB
 earthLevel.platformerType = "horizontal";
 
 earthLevel.generateLevel = function() {
-    this.level = generateEarthLevelWithObstacles(generateFireBasicLevel(200, 50));
+    this.level = generateEarthLevelWithObstacles(generateFireBasicLevel(300, 50));
 }
 
 earthLevel.drawBackground = function(backgroundChar, cx, x, y) {

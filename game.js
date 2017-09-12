@@ -62,7 +62,6 @@ Level.prototype.collisionWith = function(pos, size, type) {
         // Check if beyond boundaries
         if (xStart < 0 || xEnd > this.width || yStart < 0) return "wall";
         else if (yEnd > this.height) return "lava";
-
         grid = this.grid;
     } else if (type == "island") grid = this.islandGrid;
 

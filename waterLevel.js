@@ -228,7 +228,6 @@ Shark.prototype.draw = function(cx, x, y) {
 
 function WaterPlayer(pos) {
     PlayerNonPlatformer.call(this, pos);
-    this.health = 100;
     this.drawLast = true;
 }
 WaterPlayer.prototype = Object.create(PlayerNonPlatformer.prototype);
@@ -300,7 +299,7 @@ waterLevel.playerTouched = function(type, actor, level) {
         if (level.player.playerHitTimer == 0) {
             level.player.health -= 10;
             level.player.playerHitTimer = level.player.playerHitTimerMax;
-            Game.hud.setGameMessage("Beware of the Sharks. Shark Attacked. " + level.player.health);
+            Game.hud.setGameMessage("Shark Attacked. " + level.player.health);
         }
         if (level.player.health <= 0) {
             return "lost"

@@ -30,7 +30,7 @@ function generateRiverLevelWithObstacles(level) {
     var startX;
     var firstTime = true;
 
-    while (startY > 5) { // Add standing pfs at regular intervals
+    while (startY > 4) { // Add standing pfs at regular intervals
         // Place platform
         startX = ~~(width / 2 + Math.random() * (endX - width / 2 - 10)); // bw center and right wall
         level[startY][startX] = "n";
@@ -50,19 +50,18 @@ function generateRiverLevelWithObstacles(level) {
         startY = startY - 2;
     }
 
-    level[0][~~(width / 2) - 1] = "n";
     level[1][~~(width / 2) - 1] = "n";
     level[2][~~(width / 2) - 1] = "n";
     level[3][~~(width / 2) - 1] = "n";
-
+    level[4][~~(width / 2) - 1] = "|";
     // Set the winning goal character.
-    level[1][~~(width / 2)] = "g";
+    level[1][~~(width / 2) - 1] = "g";
     return level;
 }
 
 
 var xMargin = 1;
-var riverLevelMap = generateRiverLevelWithObstacles(generateRiverBasicLevel(50, 60, xMargin));
+var riverLevelMap = generateRiverLevelWithObstacles(generateRiverBasicLevel(40, 90, xMargin));
 
 function RiverPlayer(pos) {
     PlayerNonPlatformer.call(this, pos);
@@ -174,7 +173,7 @@ function MovingLog(pos) {
     var xSize = ~~(2 + Math.random() * 5); // Size between 2 to 7.
     var ySize = 1;
     var size = new Vector(xSize, ySize);
-    var speedX = ~~~(5 + Math.random() * 5); // Speed bw 2 to 7.
+    var speedX = ~~~(7 + Math.random() * 4); // Speed bw 2 to 7.
     this.speed = new Vector(speedX, 0);
     RiverObject.call(this, pos, "MovingLog", "brown", size);
 }
@@ -217,7 +216,7 @@ var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, riverLevelMap, riverLevelB
 riverLevel.platformerType = "vertical";
 
 riverLevel.generateLevel = function() {
-    this.level = generateRiverLevelWithObstacles(generateRiverBasicLevel(50, 60, xMargin));
+    this.level = generateRiverLevelWithObstacles(generateRiverBasicLevel(40, 90, xMargin));
 }
 
 riverLevel.drawBackground = function(backgroundChar, cx, x, y) {

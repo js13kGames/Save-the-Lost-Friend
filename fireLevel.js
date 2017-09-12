@@ -5,11 +5,10 @@ function generateFireBasicLevel(width, height) {
     for (var y = 0; y < height; y++) {
         var columns = [];
         for (var x = 0; x < width; x++) {
-            if (y > startY) {
+            if (y > startY)
                 columns.push("x");
-            } else {
+            else
                 columns.push(" ");
-            }
         }
         level.push(columns);
     }
@@ -78,7 +77,7 @@ function generateFireLevelWithObstacles(level) {
     return level;
 }
 
-var fireLevelMap = generateFireLevelWithObstacles(generateFireBasicLevel(200, 50));
+var fireLevelMap = generateFireLevelWithObstacles(generateFireBasicLevel(300, 50));
 
 function FireBolt(pos, character) {
     this.pos = pos;
@@ -215,8 +214,6 @@ VolcanoLava.prototype.draw = function(cx, x, y) {
 function FirePlayer(pos) {
     PlayerPlatformer.call(this, pos);
     this.drawLast = true;
-    this.health = 100;
-    this.flyPower = 0;
 }
 FirePlayer.prototype = Object.create(PlayerPlatformer.prototype);
 
@@ -245,7 +242,7 @@ var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBack
 fireLevel.platformerType = "horizontal";
 
 fireLevel.generateLevel = function() {
-    this.level = generateFireLevelWithObstacles(generateFireBasicLevel(200, 50));
+    this.level = generateFireLevelWithObstacles(generateFireBasicLevel(300, 50));
 }
 
 fireLevel.drawBackground = function(backgroundChar, cx, x, y) {
@@ -274,7 +271,7 @@ fireLevel.playerTouched = function(type, actor, level) {
             return inDivActor != actor;
         });
         level.player.health += 10;
-        Game.hud.setGameMessage("You ate some fruits and gained health");
+        Game.hud.setGameMessage("Gained health");
     } else if (type == "FireStoneGem" && level.status == null) {
         level.actors = level.actors.filter(function(inDivActor) {
             return inDivActor != actor;

@@ -48,12 +48,12 @@ var initNPCDialog = function(creatureName) {
             },
             "1": {
                 "question": " Do you know what happened to my lost friend?",
-                "answer": "Yes, a portal opened and many people including your friend disappeared through it.",
+                "answer": "Yes, a portal opened. Your friend and many people got lost.",
                 "askedStatus": 0
             }
         }, // end of batch 0
         "1": {
-            "welcomeMessage": "Rescue your lost friend.",
+            "welcomeMessage": "Rescue your friend.",
             "0": {
                 "question": "Who are you.?",
                 "answer": "I am the gaurdian of the " + gaurdianCreatures[creatureName].island + " island.",
