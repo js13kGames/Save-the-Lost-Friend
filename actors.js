@@ -8,8 +8,8 @@ function Player(pos) {
     this.playerHitTimerMax = 100;
     this.skipDialogTimer = 0;
     this.skipDialogTimerMax = 200;
+    this.type = "player";
 }
-Player.prototype.type = "player";
 
 Player.prototype.getHealth = function() {
     return this.health;
@@ -158,7 +158,6 @@ PlayerPlatformer.prototype = Object.create(Player.prototype);
 
 function PlayerNonPlatformer(pos) {
     Player.call(this, pos);
-    this.facingUp = true;
 }
 
 PlayerNonPlatformer.prototype = Object.create(Player.prototype);
@@ -177,14 +176,11 @@ PlayerNonPlatformer.prototype.move = function(step, level, keys) {
         this.speed.x += PLAYER_NON_PLATFORM_SPEED;
         this.facingRight = true;
     }
-    if (keys.up) {
+    if (keys.up)
         this.speed.y -= PLAYER_NON_PLATFORM_SPEED;
-        this.facingUp = true;
-    }
-    if (keys.down) {
+
+    if (keys.down)
         this.speed.y += PLAYER_NON_PLATFORM_SPEED;
-        this.facingUp = false;
-    }
 
     var motion = new Vector(this.speed.x * step, this.speed.y * step);
     var newPos = this.pos.plus(motion);
@@ -202,9 +198,6 @@ PlayerNonPlatformer.prototype.checkCollision = function(newPos, level) {
 
 PlayerNonPlatformer.prototype.act = Player.prototype.act;
 
-var wobbleSpeed = 8,
-    wobbleDist = 0.07;
-
 function Berry(pos) {
     this.pos = pos;
     this.size = new Vector(1, 1);
@@ -217,9 +210,7 @@ Berry.prototype.act = function(step) {};
 Berry.prototype.draw = function(cx, x, y) {
     cx.save();
     cx.fillStyle = "#DC143C";
-    cx.beginPath();
-    cx.arc(x, y, Game.scale / 2, 0, 2 * Math.PI);
-    cx.fill();
+    drawArc(cx, x, y, Game.scale / 2, 0, 2 * Math.PI, true);
     cx.restore();
 }
 

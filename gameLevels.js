@@ -8,6 +8,7 @@ function LevelInfo(levelType, plan, backgroundChars, actorChars) {
     this.level = plan;
     this.backgroundChars = backgroundChars;
     this.actorChars = actorChars;
+    this.display = CanvasDisplay;
 };
 
 LevelInfo.prototype.initializeChain = function(prevLevelInfo, nextLevelInfo) {

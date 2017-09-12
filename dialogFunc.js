@@ -53,7 +53,7 @@ var initNPCDialog = function(creatureName) {
             }
         }, // end of batch 0
         "1": {
-            "welcomeMessage": "You need to rescue your lost friend and all the lost people of this world.",
+            "welcomeMessage": "Rescue your lost friend.",
             "0": {
                 "question": "Who are you.?",
                 "answer": "I am the gaurdian of the " + gaurdianCreatures[creatureName].island + " island.",
@@ -71,7 +71,7 @@ var initNPCDialog = function(creatureName) {
             },
             "3": {
                 "question": "Where should I go next?",
-                "answer": "Go to the " + gaurdianCreatures[creatureName].island + " island in the " + gaurdianCreatures[creatureName].direction + " to get the gem.",
+                "answer": "To one of the islands",
                 "askedStatus": 0
             }
         },
@@ -87,15 +87,7 @@ var initNPCDialog = function(creatureName) {
         "currentBatchKey": "0"
     };
 
-    var dialogue = {
-        "0": commonDialogue["0"],
-        "1": commonDialogue["1"],
-        "2": commonDialogue["2"],
-        "3": commonDialogue["3"],
-        "4": commonDialogue["4"],
-        "currentBatchKey": "0"
-    };
-    return dialogue;
+    return Object.create(commonDialogue);
 }
 
 var crabDialogue = initNPCDialog("crab");

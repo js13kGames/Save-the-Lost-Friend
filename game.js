@@ -94,9 +94,9 @@ Level.prototype.actorAt = function(actor) {
     }
 }
 
-var maxStep = 0.05;
 // Get the minimal step size. Call the actor.act for each of the dynamic objects.
 Level.prototype.animate = function(step, keys) {
+    var maxStep = 0.05;
     if (this.status != null) { // Keep reducing the finishDelay
         this.finishDelay = this.finishDelay - step;
     }
@@ -165,6 +165,7 @@ function pauseKeyHandler() {
     if (pauseIsDown && !keys.pause) {
         Game.gamePaused = !Game.gamePaused;
         pauseIsDown = false;
+        Game.hud.clearScreen();
     }
 }
 
@@ -178,6 +179,13 @@ var runAnimation = function(frameFunc) { // frameFunc  anonymous func.
             var timeStep = Math.min(time - lastTime, 100) / 1000;
             if (!Game.gamePaused) {
                 stop = frameFunc(timeStep) == false;
+            } else {
+                Game.inInteraction = false;
+                Game.hud.drawMenuScreen();
+            }
+            if (Game.GameFirstStart || Game.GameOver) {
+                Game.gamePaused = true;
+                Game.GameFirstStart = false;
             }
         }
         lastTime = time;

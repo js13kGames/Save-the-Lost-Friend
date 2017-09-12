@@ -1,9 +1,8 @@
 var Game = {
     scale: 20,
     gamePaused: false,
-    tileSize: 20,
-    width: 1000,
-    height: 600,
+    width: 800,
+    height: 500,
     currentLevel: null,
     inInteraction: false,
     nextLevel: null,
@@ -11,7 +10,9 @@ var Game = {
     gemsCollected: {},
     numberOfGemsCollected: 0,
     gemsPlaced: {},
-    numberOfGemsPlaced: 0
+    numberOfGemsPlaced: 0,
+    GameFirstStart: true,
+    GameOver: false
 };
 
 var Vector = function(x, y) {
@@ -65,7 +66,6 @@ var drawTree = function(cx, x, y, hBranches, vBranches, treeColor) {
     var trunkHeight = 7.5 * scale;
     var rectStartX = x;
     var rectStartY = y - trunkHeight;
-
 
     // Horizontal branches Top and Bottom
     var angTopStart = Math.PI;

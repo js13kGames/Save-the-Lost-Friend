@@ -95,14 +95,11 @@ RiverPlayer.prototype.move = function(step, level, keys) {
         }
         this.facingRight = true;
     }
-    if (keys.up) {
+    if (keys.up)
         this.speed.y = -1 * PLAYER_NON_PLATFORM_SPEED;
-        this.facingUp = true;
-    }
-    if (keys.down) {
+
+    if (keys.down)
         this.speed.y = PLAYER_NON_PLATFORM_SPEED;
-        this.facingUp = false;
-    }
 
     var motion = new Vector(this.speed.x * step, this.speed.y * step);
     var newPos = this.pos.plus(motion);
@@ -217,7 +214,6 @@ var riverLevelActorChars = {
 };
 
 var riverLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, riverLevelMap, riverLevelBackgroundChars, riverLevelActorChars);
-riverLevel.display = CanvasDisplay;
 riverLevel.platformerType = "vertical";
 
 riverLevel.generateLevel = function() {

@@ -144,7 +144,6 @@ var treeHeight = 5;
 var airLevelMap = generateAirBasicLevel(50, 60, xMargin, treeHeight);
 
 var airLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, airLevelMap, airLevelBackgroundChars, airLevelActorChars);
-airLevel.display = CanvasDisplay;
 airLevel.platformerType = "vertical";
 
 airLevel.generateLevel = function() {

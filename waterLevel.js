@@ -254,7 +254,6 @@ var waterLevelActorChars = {
 };
 
 var waterLevel = new LevelInfo(LEVEL_TYPE.NONPLATFORMER, waterLevelPlan, waterLevelBackgroundChars, waterLevelActorChars);
-waterLevel.display = CanvasDisplay;
 
 waterLevel.generateLevel = function() {
     this.level = waterLevelPlan;
@@ -320,7 +319,7 @@ waterLevel.playerTouched = function(type, actor, level) {
             Game.hud.setGameMessage(gemsType + " gem placed in the portal");
         }
         if (Game.numberOfGemsPlaced == 4) {
-            Game.hud.setGameMessage("You have rescued your lost friend. You have won");
+            Game.GameOver = true;
             return "won";
         }
     }

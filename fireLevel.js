@@ -35,7 +35,7 @@ function generateFireLevelWithObstacles(level) {
     var isFlat = true;
     startX = startX + initialOffset;
     var actorList = { "0": "FIREBIRD", "1": "VOLCANO", "2": "TREE" };
-    while (startX < width - 10) {
+    while (startX < width - 12) {
         var enemySelect = actorList[String(~~(Math.random() * Object.keys(actorList).length))];
         var droppingEnemyHolderSize = 5;
         if (enemySelect == "FIREBIRD" && isFlat == true) {
@@ -142,7 +142,7 @@ FireBird.prototype.draw = function(cx, x, y) {
     cx.restore();
 }
 
-function Tree(pos, character) {
+function FireTree(pos, character) {
     this.pos = pos;
     this.size = new Vector(3, 12);
     this.horizBranchNos = 3 + getRandomElement([2, 4])
@@ -151,11 +151,11 @@ function Tree(pos, character) {
     this.addFruits = false;
 }
 
-Tree.prototype.type = "tree";
+FireTree.prototype.type = "tree";
 
-Tree.prototype.act = function(step, level) {
+FireTree.prototype.act = function(step, level) {
     if (!this.addFruits) {
-        var numberOfBerries = 2 + ~~(Math.random() * 4);
+        var numberOfBerries = 4 + ~~(Math.random() * 4);
         for (var i = 0; i < numberOfBerries; i++) {
             var xOffset = getRandomElement([-(this.horizBranchNos - 1), -1, 0, 1, 2, this.horizBranchNos + 1]);
             var yOffset = -1 * (7 + ~~(Math.random() * this.vertBranchNos));
@@ -167,9 +167,8 @@ Tree.prototype.act = function(step, level) {
     }
 };
 
-Tree.prototype.draw = function(cx, x, y) {
+FireTree.prototype.draw = function(cx, x, y) {
     cx.save();
-    //console.log(this.pos.x * Game.scale + " " + this.pos.y * Game.scale + " " + x + " " + y);   
     drawTree(cx, x, y + (1 * Game.scale), this.horizBranchNos, this.vertBranchNos, this.treeColor);
     cx.restore();
 }
@@ -238,12 +237,11 @@ var fireLevelActorChars = {
     "v": VolcanoLava,
     "f": FireBird,
     "b": FireBolt,
-    "t": Tree,
+    "t": FireTree,
     "g": FireStoneGem
 };
 
 var fireLevel = new LevelInfo(LEVEL_TYPE.PLATFORMER, fireLevelMap, fireLevelBackgroundChars, fireLevelActorChars);
-fireLevel.display = CanvasDisplay;
 fireLevel.platformerType = "horizontal";
 
 fireLevel.generateLevel = function() {
@@ -267,9 +265,9 @@ fireLevel.playerTouched = function(type, actor, level) {
     if (type == "lava" && level.status == null) {
         Game.hud.setGameMessage("Lava killed you.");
         return "lost";
-    } else if (type == "fireBolt") {
+    } else if (type == "fireBolt" && level.status == null) {
         reducePlayerHealth(50, level, "Beware of the Fire Bolt.");
-    } else if (type == "volcanoLava") {
+    } else if (type == "volcanoLava" && level.status == null) {
         reducePlayerHealth(50, level, "Beware of the Volcanic Lava.");
     } else if (type == "berry") { //Filter the berry from actor list as it is picked
         level.actors = level.actors.filter(function(inDivActor) {
